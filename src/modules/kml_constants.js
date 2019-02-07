@@ -30,4 +30,4 @@ export const AVENZAICONS = [
     'null', 'blue', 'yellow',
     'red', 'orange', 'red',
     'red', 'green', 'purple',
-].map(c => `'http://download.avenza.com/images/pdfmaps_icons/pin-${c}-inground.png'`);
+].map(c => `http://download.avenza.com/images/pdfmaps_icons/pin-${c}-inground.png`);
