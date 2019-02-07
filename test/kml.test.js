@@ -137,7 +137,7 @@ test("as kml lines", () => {
     kml.addFolder('aFolder');
     kml.addLine('aFolder', route, {"style": "route_style"});
     expect(kml.renderFolder('aFolder'))
-        .toBe('route_name/route_style/route_description/0.000000, 0.000000 90.000000, 0.000000');
+        .toBe('route_name/route_style/route_description/0.000000,0.000000 90.000000,0.000000');
 });
 
 test("as kml segments", () => {
@@ -147,8 +147,8 @@ test("as kml segments", () => {
     kml.addSegments('aFolder', route, {"style": "route_style"});
     expect(kml.renderFolder('aFolder'))
         .toBe(
-            'route_name: P1->P2/route_style/0.000000, 0.000000 45.000000, 0.000000\n'
-            + 'route_name: P2->P3/route_style/45.000000, 0.000000 90.000000, 0.000000');
+            'route_name: P1->P2/route_style/0.000000,0.000000 45.000000,0.000000\n'
+            + 'route_name: P2->P3/route_style/45.000000,0.000000 90.000000,0.000000');
 });
 
 test("as kml points", () => {

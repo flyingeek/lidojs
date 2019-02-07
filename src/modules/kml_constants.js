@@ -8,6 +8,9 @@ export const PIN_RED = 6
 export const PIN_GREEN = 7
 export const PIN_PURPLE = 8
 
+export const NAT_POSITION_ENTRY = 0
+export const NAT_POSITION_EXIT = 1
+
 export const PINS = [
     '#placemark-none', '#placemark-blue', '#placemark-yellow',
     '#placemark-brown', '#placemark-orange', '#placemark-pink',

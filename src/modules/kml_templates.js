@@ -17,7 +17,7 @@ export const pointTemplate = ({point, style}) => `
       <styleUrl>${style}</styleUrl>
       <description><![CDATA[${point.description || ''}]]></description>
       <Point>
-        <coordinates>${point.longitude.toFixed(6)}, ${point.latitude.toFixed(6)}</coordinates>
+        <coordinates>${point.longitude.toFixed(6)},${point.latitude.toFixed(6)}</coordinates>
       </Point>
     </Placemark>
 `;
@@ -84,8 +84,7 @@ export const folderTemplate = ({name, content, open=1}) => `
  * @param {string} folders
  * @returns {string}
  */
-export const template = ({name, styles, folders}) => `
-<?xml version='1.0' encoding='UTF-8'?>
+export const template = ({name, styles, folders}) => `<?xml version='1.0' encoding='UTF-8'?>
 <kml xmlns='http://www.opengis.net/kml/2.2'>
   <Document>
     <name><![CDATA[${name}]]></name>
@@ -103,13 +102,12 @@ export const template = ({name, styles, folders}) => `
  * @param {string} folders
  * @returns {string}
  */
-export const avenzaTemplate = ({name, styles, folders}) => `
-<?xml version='1.0' encoding='UTF-8'?>
+export const avenzaTemplate = ({name, styles, folders}) => `<?xml version='1.0' encoding='UTF-8'?>
 <kml xmlns='http://www.opengis.net/kml/2.2'>
   <Document>
     <name><![CDATA[${name}]]></name>
         ${styles}
-        <Folder><name><![CDATA[{name}]]></name>
+        <Folder><name><![CDATA[${name}]]></name>
         ${folders}
         </Folder>
   </Document>
@@ -133,6 +131,7 @@ export const styleTemplate = ({id, color, width=6}) => `
     </Style>
 `;
 
+export const avenzaStyleTemplate = ({id, color, width=2}) => styleTemplate({id, color, width});
 
 /**
  * IconsStyle Style renderer
@@ -152,3 +151,5 @@ export const iconTemplate = ({id, href, x="0.5", y="0.0"}) => `
         </IconStyle>
     </Style>
 `;
+
+export const avenzaIconTemplate = ({id, href, x="0.5", y="0.5"}) => iconTemplate({id, href, x, y});

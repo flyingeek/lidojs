@@ -124,8 +124,16 @@ class GeoPoint {
     constructor(mixedValue, {name="", description="", normalizer=array_normalizer} = {}){
         if (mixedValue instanceof GeoPoint) {
             this.latlng = mixedValue.latlng;
+            name = name || mixedValue.name || "";
+            description = description || mixedValue.description || "";
         } else if (mixedValue instanceof LatLng) {
             this.latlng = mixedValue;
+        } else if (mixedValue
+            && Reflect.has(mixedValue, "longitude")
+            && Reflect.has(mixedValue, "latitude")) {
+            this.latlng = new LatLng(parseFloat(mixedValue.latitude), parseFloat(mixedValue.longitude));
+            name = name || mixedValue.name || "";
+            description = description || mixedValue.description || "";
         } else {
             this.latlng = normalizer ? normalizer(mixedValue) : mixedValue;
         }

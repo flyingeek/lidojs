@@ -26,12 +26,20 @@ class KMLFolder {
         this.options = options;
         this.linestrings = []; // {String[]}
         this.placemarks = []; // {Object[]}
-        this.lineStyle = '';
-        this[pinProp] = options.pinId || PIN_NONE;
-        this.enabled = options.enabled || true;
+        this.lineStyle = {};
+        this[pinProp] = (options.pinId === undefined) ? PIN_NONE : options.pinId;
+        this.enabled = (options.enabled === undefined) ? true : options.enabled;
     }
     get pin() {
         return this[pinProp];
+    }
+
+    /**
+     * empty the folder data
+     */
+    empty(){
+        this.linestrings = [];
+        this.placemarks = [];
     }
 
     /**
@@ -75,7 +83,7 @@ class KMLGenerator {
      * @param {function} [renderers.segmentTemplate=segmentTemplate] - linestring segments renderer
      * @param {function} [renderers.icons=GOOGLEICONS] - icons (pins) to use
      */
-    constructor(renderers) {
+    constructor(renderers={}) {
         this.folders = new Map();
         this.template = renderers.template || template;
         this.pointTemplate = renderers.pointTemplate || pointTemplate;
@@ -134,7 +142,7 @@ class KMLGenerator {
         let folder = new KMLFolder(name, options);
         this.folders.set(name, folder);
         let value = {'id': name, 'color': name + '_color'};
-        folder.lineStyle = this.styleTemplate({...value, ...options});
+        folder.lineStyle = {...value, ...options};
     }
 
     /**
@@ -244,7 +252,7 @@ class KMLGenerator {
 
         for (let [,folder] of this.folders){
             if (folder.enabled) {
-                styles += folder.lineStyle
+                styles += this.styleTemplate(folder.lineStyle)
             }
         }
         return this.template({...options, "styles": styles, "folders": this.renderFolders()});
@@ -299,7 +307,7 @@ class KMLGenerator {
      * @returns {string}
      */
     renderLine (points, options={}, isSegment=false){
-        const tpl = (p) => `${p.longitude.toFixed(6)}, ${p.latitude.toFixed(6)}`;
+        const tpl = (p) => `${p.longitude.toFixed(6)},${p.latitude.toFixed(6)}`;
         const coordinates = points.map(p => tpl(p)).join(' ');
         const value = {...options, coordinates};
         return isSegment ? this.segmentTemplate(value) : this.lineTemplate(value);
@@ -325,6 +333,25 @@ class KMLGenerator {
     changeFolderPin(name, pin){
         this.folders.get(name).pin = pin
     }
+
+    /**
+     * Change folder state shortcut
+     * @param {string} name
+     * @param {boolean} enabled - enable or disable folder
+     */
+    changeFolderState(name, enabled){
+        this.folders.get(name).enabled = enabled;
+    }
+
+    /**
+     * reset KML Generator
+     */
+    reset(){
+        for (let [, folder] of this.folders){
+            folder.empty();
+        }
+    }
+
 }
 
 export {KMLGenerator};
