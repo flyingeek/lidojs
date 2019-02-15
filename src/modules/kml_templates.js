@@ -131,7 +131,7 @@ export const styleTemplate = ({id, color, width=6}) => `
     </Style>
 `;
 
-export const avenzaStyleTemplate = ({id, color, width=2}) => styleTemplate({id, color, width});
+export const avenzaStyleTemplate = ({id, color, width=3}) => styleTemplate({id, color, width});
 
 /**
  * IconsStyle Style renderer

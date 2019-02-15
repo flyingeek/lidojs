@@ -322,7 +322,7 @@ class KMLGenerator {
     changeFolderColor(name, color, options={}){
         const value = {'id': name, 'color': color};
         const folder = this.folders.get(name);
-        folder.lineStyle = this.styleTemplate({...value, ...options});
+        folder.lineStyle = {...value, ...options};
     }
 
     /**
