@@ -183,7 +183,7 @@ test("changeFolderColor", () => {
     kml.styleTemplate = ({color}) => `${color}`;
     kml.addFolder('aFolder', {"color": "64102030"});
     kml.changeFolderColor("aFolder", "64FFEEDD");
-    expect(kml.folders.get("aFolder").lineStyle).toBe("64FFEEDD");
+    expect(kml.folders.get("aFolder").lineStyle.color).toBe("64FFEEDD");
 });
 
 test.skip("test_kml_ofp374_22Jul2016", () => {
