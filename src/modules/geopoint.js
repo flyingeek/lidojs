@@ -1,10 +1,10 @@
 import {LatLng, LatPhi} from "./geolite";
 
 
-// eath mean radius in meters
+// earth mean radius in meters
 // nm in meters
-const R = 6371000.0
-const NM = 1852.0
+const R = 6371000.0;
+const NM = 1852.0;
 
 // Converters
 const rad_to_nm = (radians) => radians * R / NM;
