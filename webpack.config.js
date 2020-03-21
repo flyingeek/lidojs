@@ -1,5 +1,5 @@
 const path = require('path');
-const config = require('./package.json');
+// const config = require('./package.json');
 
 // eslint-disable-next-line require-jsdoc
 function createConfig(options) {
@@ -15,7 +15,7 @@ function createConfig(options) {
     ],
     "output": {
       "path": path.resolve(__dirname, 'dist'),
-      "filename": 'lidojs-' + config.version + targetExtension + minExtension + '.js',
+      "filename": 'lidojs' + targetExtension + minExtension + '.js',
       "library": 'editolido',
       "libraryTarget": options.target
     },
