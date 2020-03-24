@@ -35,9 +35,8 @@ test("add folders", () => {
 });
 
 test("computeOptions", () => {
-    let options={};
     kml.addFolder('folder');
-    options = kml.computeOptions('folder');
+    let options = kml.computeOptions('folder');
     expect(options.style).toEqual('#folder');
     options = kml.computeOptions('folder', {'style': 'test'});
     expect(options.style).toEqual('test');
@@ -48,6 +47,7 @@ test("computeOptions", () => {
 test("addLine", () => {
     kml.addFolder('aFolder');
     const route = new Route([p1, p2], {"name": "route"});
+    // noinspection JSCheckFunctionSignatures
     kml.addLine('aFolder', route, {"color": "blouge"});
     expect(kml.renderFolder('aFolder')).toEqual("route blouge");
 });
@@ -55,6 +55,7 @@ test("addLine", () => {
 test("addPoints", () => {
     kml.addFolder('aFolder', {"pinId": PIN_ORANGE});
     const route = new Route([p1, p3], {"name": "route"});
+    // noinspection JSCheckFunctionSignatures
     kml.addPoints('aFolder', route, {"color": "blouge"});
     expect(kml.renderFolder('aFolder'))
         .toEqual(
@@ -64,8 +65,10 @@ test("addPoints", () => {
 
 test("addSegments", () => {
     kml.addFolder('aFolder', {"pinId": PIN_ORANGE});
+    // noinspection CommaExpressionJS
     p1.name = "p1", p2.name = "p2", p3.name = "p3";
     const route = new Route([p1, p2, p3], {"name": "route"});
+    // noinspection JSCheckFunctionSignatures
     kml.addPoints('aFolder', route, {"color": "blouge"});
     expect(kml.renderFolder('aFolder')).toEqual(
         'p1blouge#placemark-orange\np2blouge#placemark-orange\np3blouge#placemark-orange');
@@ -90,6 +93,7 @@ describe("Adding point when folder pin is set", () => {
     test("point without style inherit style from folder pin", () => {
         p1.name = "P1";
         kml.addFolder('aFolder', {"pinId": PIN_ORANGE});
+        // noinspection JSCheckFunctionSignatures
         kml.addPoint('aFolder', p1, {"color": 'blouge'});
         expect(kml.renderFolder('aFolder')).toEqual('P1blouge#placemark-orange');
     });
@@ -104,6 +108,7 @@ describe("Adding point when folder pin is set", () => {
 test("render", () => {
     p1.name = "P1";
     kml.folderTemplate = ({name, open, content}) => `${name} ${open} ${content}`;
+    // noinspection JSCheckFunctionSignatures
     kml.addFolder('aFolder', {"open": 1});
     kml.addPoint('aFolder', p1, {"color": 'blouge', "style": '#mystyle'});
     const output = kml.render({"extra": "what else ?", "name": "no name", "aFolder_color": "white"});
@@ -113,6 +118,7 @@ test("render", () => {
 test("renderFolder", () => {
     p1.name = "P1";
     kml.folderTemplate = ({name, open, content}) => `${name} ${open} ${content}`;
+    // noinspection JSCheckFunctionSignatures
     kml.addFolder('aFolder', {"open": 1});
     kml.addPoint('aFolder', p1, {"color": 'blouge', "style": '#mystyle'});
     const output = kml.renderFolder('aFolder');
@@ -120,12 +126,14 @@ test("renderFolder", () => {
 });
 
 test("renderFolders", () => {
+    // noinspection CommaExpressionJS
     p1.name = "P1", p2.name = "P2";
     kml.folderTemplate = ({name, open, content}) => `${name} ${open} ${content}`;
     kml.addFolders(
         {"name": 'aFolder', "open": 1},
         {"name": "another", "pinId": PIN_RED, "open": 1});
     kml.addPoint('aFolder', p1, {"color": 'blouge', "style": '#mystyle'});
+    // noinspection JSCheckFunctionSignatures
     kml.addPoint('another', p2, {"color": 'red'});
     const output = kml.renderFolders();
     expect(output).toBe('aFolder 1 P1blouge#mystyle\nanother 1 P2red#placemark-red');
@@ -133,7 +141,7 @@ test("renderFolders", () => {
 
 test("as kml lines", () => {
     kml.lineTemplate = ({name, style, description, coordinates}) => `${name}/${style}/${description}/${coordinates}`;
-    const route = new Route([p1, p3], {"name": "route_name", "description": "route_description"})
+    const route = new Route([p1, p3], {"name": "route_name", "description": "route_description"});
     kml.addFolder('aFolder');
     kml.addLine('aFolder', route, {"style": "route_style"});
     expect(kml.renderFolder('aFolder'))
@@ -141,8 +149,9 @@ test("as kml lines", () => {
 });
 
 test("as kml segments", () => {
+    // noinspection CommaExpressionJS
     p1.name = "P1", p2.name = "P2", p3.name = "P3";
-    const route = new Route([p1, p2, p3], {"name": "route_name", "description": "route_description"})
+    const route = new Route([p1, p2, p3], {"name": "route_name", "description": "route_description"});
     kml.addFolder('aFolder');
     kml.addSegments('aFolder', route, {"style": "route_style"});
     expect(kml.renderFolder('aFolder'))
@@ -152,9 +161,10 @@ test("as kml segments", () => {
 });
 
 test("as kml points", () => {
+    // noinspection CommaExpressionJS
     p1.name = "P1", p2.name = "P2", p2.description = "D2";
     kml.pointTemplate = ({point, style}) => `${point.name || point.dm}/${style}/${point.description||''}/${point.longitude}, ${point.latitude}`;
-    const route = new Route([p1, p2], {"name": "route_name", "description": "route_description"})
+    const route = new Route([p1, p2], {"name": "route_name", "description": "route_description"});
     kml.addFolder('aFolder');
     kml.addPoints('aFolder', route, {"style": "point_style"});
     expect(kml.render({
@@ -181,6 +191,7 @@ test("change pin of a folder", () => {
 
 test("changeFolderColor", () => {
     kml.styleTemplate = ({color}) => `${color}`;
+    // noinspection JSCheckFunctionSignatures
     kml.addFolder('aFolder', {"color": "64102030"});
     kml.changeFolderColor("aFolder", "64FFEEDD");
     expect(kml.folders.get("aFolder").lineStyle.color).toBe("64FFEEDD");

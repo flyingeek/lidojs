@@ -128,7 +128,7 @@ class GeoPoint {
             description = description || mixedValue.description || "";
         } else if (mixedValue instanceof LatLng) {
             this.latlng = mixedValue;
-        } else if (mixedValue
+        } else if (mixedValue && typeof mixedValue === 'object'
             && Reflect.has(mixedValue, "longitude")
             && Reflect.has(mixedValue, "latitude")) {
             this.latlng = new LatLng(parseFloat(mixedValue.latitude), parseFloat(mixedValue.longitude));
@@ -197,7 +197,7 @@ class GeoPoint {
      * @param {?function} options.normalizer
      * @returns {GeoPoint}
      */
-    static getCenter(geopoints, options){
+    static getCenter(geopoints, options={}) {
         let howMany = geopoints.length,
             phi = 0,
             rlat = 0,

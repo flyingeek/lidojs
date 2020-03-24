@@ -43,7 +43,7 @@ test("dm2decimal", () => {
 });
 
 test("latlng_normaliser", () => {
-  const latlng = array_normalizer([1, 2])
+  const latlng = array_normalizer([1, 2]);
   expect(latlng.latitude).toBe(1);
   expect(latlng.longitude).toBe(2);
 });
@@ -124,7 +124,7 @@ test("equals", () => {
   expect(geopoint1.equals(geopoint2)).toBeFalsy();
   geopoint1 = new GeoPoint([0, 46.6822]);
   geopoint2 = new GeoPoint([0, 46.6822001]);
-  expect(geopoint1.equals(geopoint1)).toBeTruthy();
+  expect(geopoint1.equals(geopoint2)).toBeTruthy();
 });
 
 test("atFraction", () => {
@@ -157,7 +157,7 @@ test("creation from LatPhi", () => {
 });
 
 test("GeoPoint object StringTag", () => {
-  expect(new GeoPoint().toString()).toBe('[object GeoPoint]');
+  expect(new GeoPoint([30, 13]).toString()).toBe('[object GeoPoint]');
 });
 
 test("getCenter", () => {

@@ -18,7 +18,7 @@ function createConfig(options) {
       "filename": 'lidojs' + targetExtension + minExtension + '.js',
       "library": 'editolido',
       "libraryTarget": options.target
-    },
+    }
   };
 }
 

@@ -10,7 +10,8 @@ test("route segments", () => {
     expect(route.segments).toEqual([[a, b], [b, c]]);
     route = new Route([a, b]);
     expect(route.segments).toEqual([[a, b]]);
-    route = new Route();
+    // noinspection JSCheckFunctionSignatures
+  route = new Route();
     expect(route.segments).toEqual([]);
     route = new Route([a, c]); //TODO seems a duplicate of [a, b] no ?
     expect(route.segments).toEqual([[a, c]]);
@@ -60,7 +61,8 @@ test("route equals", () => {
 });
 
 test("distance", () => {
-    expect(new Route().distance(null)).toBeCloseTo(0);
+  // noinspection JSCheckFunctionSignatures
+  expect(new Route().distance(null)).toBeCloseTo(0);
     let a = new GeoPoint([0, 0]);
     let b = new GeoPoint([0, 90]);
     let c = new GeoPoint([0, 180]);
@@ -72,11 +74,13 @@ test("distance", () => {
 });
 
 test("Route object StringTag", () => {
-   expect(new Route().toString()).toBe('[object Route]');
+  // noinspection JSCheckFunctionSignatures
+  expect(new Route().toString()).toBe('[object Route]');
 });
 
 test("route iterator", () => {
-    const route = new Route(['a', 'b', 'c']);
+  // noinspection JSCheckFunctionSignatures
+  const route = new Route(['a', 'b', 'c']);
     let i = 0;
     for (let p of route){
         expect(p).toBe(route.points[i]);
@@ -85,6 +89,7 @@ test("route iterator", () => {
 });
 
 test("route split", () => {
+    // noinspection JSCheckFunctionSignatures
     let route = new Route();
     expect(route.split(60).points).toEqual([]);
     let start = new GeoPoint([0, 0]);

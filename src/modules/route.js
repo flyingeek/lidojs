@@ -50,7 +50,7 @@ class Route {
 
     /**
      * if route points are [a, b, c], this returns [[a, b], [b, c]]
-     * @returns {Array}
+     * @returns {GeoPoint[]}
      */
     get segments() {
         let segments = [];
@@ -85,18 +85,18 @@ class Route {
      *
      * @param {number} maxLength - length of the segment, by default in NM
      * @param {?Object} options - additional options are the Route options
-     * @param {?function} options.converter - must transform maxLength in radians
-     * @param {boolean} options.preserve - if false, split at maxLength, do not keep intermediary points
-     * @param {string} options.name - generated route name
-     * @param {string} options.description - generated route description
+     * @param {?function} [options.converter] - must transform maxLength in radians
+     * @param {?boolean} [options.preserve] - if false, split at maxLength, do not keep intermediary points
+     * @param {string} [options.name] - generated route name
+     * @param {string} [options.description] - generated route description
      * @returns {Route}
      */
-    split(maxLength, options){
+    split(maxLength, options = {}){
         let {converter=nm_to_rad, preserve=false} = options || {};
         let points = [];
         let remaining = 0;
         let first = true;
-        let maxRadians = (converter) ? converter(maxLength) : maxLength
+        let maxRadians = (converter) ? converter(maxLength) : maxLength;
         let geopoint1 = null,
             geopoint2 = null;
         for ([geopoint1, geopoint2] of this.segments) {

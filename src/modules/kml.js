@@ -149,7 +149,7 @@ class KMLGenerator {
      * add multiple folders in our virtual kml
      * @param {...{string|Object}} items - ...{name, [pin=0], ...}
      * @param {string} items.name - folder name
-     * @param {number} items.pin - folder pinId
+     * @param {number} [items.pin=0] - folder pinId
      */
     addFolders (...items) {
         for (let value of items) {
