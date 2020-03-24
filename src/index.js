@@ -3,3 +3,4 @@ export {AVENZAICONS, GOOGLEICONS, NAT_POSITION_ENTRY, NAT_POSITION_EXIT, PINS, P
 export {Route, Track} from "./modules/route"
 export {avenzaIconTemplate, avenzaStyleTemplate, avenzaTemplate, iconTemplate, styleTemplate, template} from "./modules/kml_templates";
 export {KMLGenerator} from "./modules/kml";
+export {Ofp} from "./modules/ofp";
