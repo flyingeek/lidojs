@@ -13,7 +13,7 @@ test("loadOFP", () => {
 
 test("infos", () => {
   const infos = ofp.infos;
-  expect(infos.rawFplText).toEqual(
+  expect(infos.rawfpl).toEqual(
     "(FPL-AFR010-IS -A388/H-SDE2E3GHIJ4J5M1P2RWXYZ/LB1D1 -LFPG1450 -N0480F260 ATREX3A ATREX UT225 VESAN UL613 SOVAT/N0502F380 UL613 SANDY UN601 LESTA UP6 RODOL UM65 TENSO L603 REMSI DCT GOMUP/M086F380 NATB LOMSI/N0498F380 DCT DANOL DCT ENE J121 SEY PARCH3 -KJFK0705 KBOS -PBN/A1B1C1D1L1O1S2 DAT/1FANSP2PDC SUR/RSP180 DOF/190927 REG/FHPJE EET/EGTT0019 EGPX0104 EGGX0129 58N020W0209 CZQX0249 57N040W0329 55N050W0415 LOMSI0449 CZUL0504 CZQM0546 KZBW0608 SEL/CPHQ CODE/39BD24 OPR/AFR PER/C RVR/075 RMK/ACAS TCAS)"
   );
   expect(infos.flight).toEqual("AF010");
@@ -30,7 +30,7 @@ test("infos", () => {
 });
 
 test("fpl", () => {
-  expect(ofp.fpl)
+  expect(ofp.fpl())
     .toEqual([
       "LFPG", "ATREX3A", "ATREX", "UT225", "VESAN", "UL613", "SOVAT/N0502F380",
       "UL613", "SANDY", "UN601", "LESTA", "UP6", "RODOL", "UM65", "TENSO", "L603",
@@ -73,7 +73,7 @@ test("trackParser", () => {
 });
 
 test("tracks", () => {
-  let tracks = ofp.tracks();
+  let tracks = ofp.tracks;
   expect(tracks.length).toEqual(5);
   expect(tracks[0].isMine).toBeFalsy();
   expect(tracks[0].isComplete).toBeTruthy();
@@ -82,4 +82,8 @@ test("tracks", () => {
   expect(tracks[1].isMine).toBeTruthy();
   expect(tracks[1].isComplete).toBeTruthy();
   expect(tracks[1].points.length).toEqual(6);
+});
+
+test("lidoRoute", () => {
+  expect(ofp.lidoRoute().join(" ")).toEqual("LFPG N4900.9E00225.0 N4907.1E00219.2 ATREX UT225 VESAN UL613 SOVAT UL613 SANDY UN601 LESTA UP6 RODOL UM65 TENSO L603 REMSI DCT GOMUP 58N020W 58N030W 57N040W 55N050W LOMSI DCT DANOL DCT ENE J121 SEY N4106.0W07207.2 N4055.8W07247.9 N4041.1W07302.0 N4041.2W07320.6 N4045.6W07337.8 KJFK KBOS");
 });
