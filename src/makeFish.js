@@ -1,9 +1,16 @@
 const Papa = require('papaparse');
 const fs = require('fs');
+const https = require('https');
 
-try {
-  // eslint-disable-next-line no-sync
-    const data = fs.readFileSync('./src/wpts_oca.csv', 'utf8');
+const fishPath = "./src/modules/fishpoints.json";
+const gistURL = "https://gist.githubusercontent.com/flyingeek/03083c65997e02b65664fb6796fdcf41/raw/6264a52e69e0dd9947e71722629b3e1fc443675b/wpts_oca.csv";
+
+https.get(gistURL, (response) => {
+  let data = "";
+  response.on("data", (chunk) => {
+    data += chunk;
+  });
+  response.on("end", () => {
     const parsed = Papa.parse(data);
     const results = {};
     parsed.data.forEach(([name, lat, lon]) => {
@@ -15,12 +22,11 @@ try {
         ];
       }
     });
-    //console.log(JSON.stringify(results));
-    fs.writeFile('./src/modules/fishpoints.json', JSON.stringify(results), (err) => {
+    fs.writeFile(fishPath, JSON.stringify(results), (err) => {
       if (err) throw err;
       console.log('Saved!');
     });
-} catch (e) {
-    console.log('Error:', e.stack);
-}
+  })
+});
+
 
