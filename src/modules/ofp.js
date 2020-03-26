@@ -344,8 +344,8 @@ export class Ofp {
     lidoPoints.push(destination);
     lidoPoints.unshift(departure);
     // adds alternates and ralts
-    lidoPoints = lidoPoints.concat(this.infos.alternates);
-    lidoPoints= lidoPoints.concat(this.infos.ralts);
+    lidoPoints = lidoPoints.concat(...this.infos.alternates);
+    lidoPoints= lidoPoints.concat(...this.infos.ralts);
     return lidoPoints;
   }
 }
