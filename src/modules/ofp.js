@@ -115,8 +115,13 @@ export class Ofp {
    * @returns {[]}
    */
   trackParser() {
-    let extract = this.text
-      .extract("TRACKSNAT", "NOTES:");
+    let extract = "";
+    try {
+      extract = this.text
+        .extract("TRACKSNAT", "NOTES:");
+    } catch (e) {
+      return [];
+    }
     let results = [];
     if (extract.includes("REMARKS:")) {
       extract = extract.split("REMARKS:", 1)[0];
