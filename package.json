@@ -10,12 +10,16 @@
   "license": "ISC",
   "repository": "https://github.com/flyingeek/lidojs",
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "lint": "eslint src/**",
     "test": "jest test",
     "coverage": "jest --collectCoverageFrom=src/**.js --coverage src",
     "build": "webpack",
     "makefish": "node src/makeFish.js",
     "release": "npm version patch && webpack"
+  },
+    "resolutions": {
+    "minimist": "^1.2.5"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
