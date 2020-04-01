@@ -1,0 +1,6 @@
+# This file is used by WorkingCopy App
+
+.idea/
+node_modules/
+dist/
+package-lock.json
