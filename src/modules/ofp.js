@@ -93,21 +93,12 @@ export class Ofp {
   }
 
   /**
-   * return the label designating the track in the FPL
-   * @param letter
-   * @returns {string}
-   */
-  static fplTrackLabel(letter) {
-    return `NAT${letter}`;
-  }
-
-  /**
    * check if the designated track is in the FPL
    * @param letter
    * @returns {boolean}
    */
   isMyTrack(letter) {
-    return this.fplRoute.indexOf(Ofp.fplTrackLabel(letter)) !== -1;
+    return this.fplRoute.indexOf(Track.label(letter)) !== -1;
   }
 
   /**
@@ -333,7 +324,7 @@ export class Ofp {
         let letter = track.name.slice(-1);
         let results = recursiveNatReplace(
           lidoPoints,
-          Ofp.fplTrackLabel(letter),
+          Track.label(letter),
           track.points.map((p) => p.name)
         );
         if (results.length > 0) {

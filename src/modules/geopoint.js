@@ -189,6 +189,27 @@ class GeoPoint {
     }
 
     /**
+     * Get the course in radians between to GeoPoints
+     * @param {GeoPoint} geopoint1 start GeoPoint
+     * @param {GeoPoint} geopoint2 end GeoPoint
+     * @returns {number} the course in radians
+     */
+    static course(geopoint1, geopoint2) {
+        return geopoint1.course_to(geopoint2);
+    }
+
+    /**
+     * Given the segment AB, computes cross track error at point D
+     * @param {GeoPoint} point GeoPoint D
+     * @param {[GeoPoint, GeoPoint]} segment segment AB
+     * @param {?function} converter the converter to use
+     * @returns {number} the xtd in radians unless a converter is given
+     */
+    static xtd(point, segment, converter=null) {
+        return point.xtd_to(segment, converter);
+    }
+
+    /**
      * Returns a pseudo center points from a list of GeoPoints
      * @param {GeoPoint[]} geopoints
      * @param {?Object} options
@@ -240,6 +261,42 @@ class GeoPoint {
             return converter(sd);
         }
         return sd;
+    }
+
+    /**
+     * Get the course to another point
+     * @param {GeoPoint} other GeoPoint
+     * @returns {number} the course in radian
+     */
+    course_to(other) {
+        const rlat1 = this.latphi.rlat;
+        const phi1 = this.latphi.phi;
+        const rlat2 = other.latphi.rlat;
+        const phi2 = other.latphi.phi;
+        return Math.fmod(
+            Math.atan2(
+                Math.sin(phi1 - phi2) * Math.cos(rlat2),
+                Math.cos(rlat1) * Math.sin(rlat2) - Math.sin(rlat1) * Math.cos(rlat2) * Math.cos(phi1 - phi2)
+            ),
+            2 * Math.pi
+        );
+    }
+
+    /**
+     * Given the segment AB; computes cross track error
+     * @param {[GeoPoint, GeoPoint]} segment the segment AB 
+     * @param {?function} converter the converter to use otherwise result in radians
+     * @returns {number} the distance in radian unless a converter is set
+     */
+    xtd_to(segment, converter=null) {
+        const crs_ab = segment[0].course_to(segment[1]);
+        const crs_ad = segment[0].course_to(this);
+        const dist_ad = segment[0].distanceTo(this);
+        const xtd = Math.asin(Math.sin(dist_ad) * Math.sin(crs_ad - crs_ab));
+        if (converter !== null) {
+            return converter(xtd);
+        }
+        return xtd;
     }
 
     /**

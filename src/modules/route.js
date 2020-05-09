@@ -148,6 +148,15 @@ class Track extends Route {
     get [Symbol.toStringTag]() {
         return 'Track';
     }
+
+    /**
+     * Given a track letter, returns the track label used in FPL
+     * @param {string} letter the track letter designator
+     * @return {string} the track label
+     */
+    static label(letter) {
+        return `NAT${letter}`;
+    }
 }
 
 export {Route, Track};
