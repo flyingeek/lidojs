@@ -4,3 +4,4 @@ export {Route, Track} from "./modules/route"
 export {avenzaIconTemplate, avenzaStyleTemplate, avenzaTemplate, iconTemplate, styleTemplate, template} from "./modules/kml_templates";
 export {KMLGenerator} from "./modules/kml";
 export {Ofp} from "./modules/ofp";
+export {GEO_HASH_GRID_SIZE, GeoGridIndex} from "./modules/geoindex";

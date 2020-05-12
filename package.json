@@ -13,11 +13,19 @@
     "preinstall": "npx npm-force-resolutions",
     "lint": "eslint src/**",
     "test": "jest test",
+    "clean": "rimraf dist/**",
     "coverage": "jest --collectCoverageFrom=src/**.js --coverage src",
     "build": "webpack",
     "makefish": "node src/makeFish.js",
+    "makewmo": "node src/makeWmo.js",
     "release": "npm version patch && webpack"
   },
+  "browserslist": [
+    "last 2 chrome versions",
+    "last 2 safari versions",
+    "last 2 firefox versions",
+    "last 2 ios versions"
+  ],
   "resolutions": {
     "minimist": "^1.2.5"
   },
@@ -27,10 +35,13 @@
     "@babel/register": "^7.9.0",
     "@jest/types": "^25.2.1",
     "babel-jest": "^25.2.1",
+    "browserslist": "^4.12.0",
     "eslint": "^6.8.0",
     "jest": "^25.2.1",
+    "ngeohash": "^0.6.3",
     "papaparse": "^5.1.1",
     "regenerator-runtime": "^0.13.5",
+    "rimraf": "^3.0.2",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11"
   },

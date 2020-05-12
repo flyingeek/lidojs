@@ -26,5 +26,5 @@ module.exports = [
     createConfig({"target": "var", "minimize": true}),
     createConfig({"target": "var", "minimize": false}),
     createConfig({"target": "umd", "minimize": true}),
-    createConfig({"target": "umd", "minimize": false}),
+    createConfig({"target": "umd", "minimize": false})
 ];

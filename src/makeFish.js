@@ -17,14 +17,17 @@ https.get(gistURL, (response) => {
       if (name && name !== "Name") {
         //console.log(`"${name}": [${lat}, ${lon}]`);
         results[name] = [
-          parseFloat(lat.replace(",", ".")),
-          parseFloat(lon.replace(",", "."))
+          +parseFloat(lat.replace(",", ".")).toFixed(6),
+          +parseFloat(lon.replace(",", ".")).toFixed(6)
         ];
       }
     });
     fs.writeFile(fishPath, JSON.stringify(results), (err) => {
-      if (err) throw err;
-      console.log('Saved!');
+      if (err) {
+        throw err;
+      } else {
+        console.log('Saved!');
+      }
     });
   })
 });
