@@ -23,6 +23,7 @@ export class GeoGridIndex {
 
     /**
      * Get Nearest points based on the geohash of the point
+     * It returns all wmo points in the 9 adjacents tiles
      * @param {GeoPoint} centerPoint
      * @param {number} radius the radius in radians (unless a converter is given)
      * @param {?function} converter
@@ -45,7 +46,8 @@ export class GeoGridIndex {
             throw new Error(`Too large radius, please rebuild GeoHashGrid with precision="${suggestedPrecision}"`);
         }
         const centerHash = geohash.encode(centerPoint.latitude, centerPoint.longitude, this.precision);
-        const meAndNeighbors = geohash.neighbors(centerHash).push(centerHash);
+        let meAndNeighbors = geohash.neighbors(centerHash);
+        meAndNeighbors.push(centerHash);
         for (const hash of meAndNeighbors) {
             if (hash in this.data) {
                 for (const [name, latitude, longitude] of this.data[hash]) {
@@ -67,13 +69,13 @@ export class GeoGridIndex {
             radius = converter(radius);
         }
         for (const geoPoint of this.getNearestPointsDirty(centerPoint, radius, null)) {
-            let distance = geoPoint.distanceTo(centerPoint, converter=null);
+            let distance = geoPoint.distanceTo(centerPoint, null);
             if (distance <= radius) {
                 if (converter !== null) {
                     distance /= converter(1.0);
                 }
+                yield [distance, geoPoint];
             }
-            yield [distance, geoPoint];
         }
     }
 }
