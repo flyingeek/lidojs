@@ -1,6 +1,6 @@
 const path = require('path');
 // const config = require('./package.json');
-
+const CopyPlugin = require('copy-webpack-plugin');
 // eslint-disable-next-line require-jsdoc
 function createConfig(options) {
   const targetExtension = (options.target === "umd") ? "" : "." + options.target;
@@ -21,10 +21,19 @@ function createConfig(options) {
     }
   };
 }
-
 module.exports = [
-    createConfig({"target": "var", "minimize": true}),
-    createConfig({"target": "var", "minimize": false}),
-    createConfig({"target": "umd", "minimize": true}),
-    createConfig({"target": "umd", "minimize": false})
+  createConfig({"target": "var", "minimize": true}),
+  createConfig({"target": "var", "minimize": false}),
+  createConfig({"target": "umd", "minimize": true}),
+  createConfig({"target": "umd", "minimize": false}),
+  {
+    "mode": "production",
+    "plugins": [
+      new CopyPlugin(
+        [
+          {"from": './src/modules/wmo.json', "to": 'wmo.json'},
+        ],
+      ),
+    ]
+  },
 ];

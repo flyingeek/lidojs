@@ -74,7 +74,7 @@ export class GeoGridIndex {
                 if (converter !== null) {
                     distance /= converter(1.0);
                 }
-                yield [distance, geoPoint];
+                yield [geoPoint, distance];
             }
         }
     }

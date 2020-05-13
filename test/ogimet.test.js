@@ -6,7 +6,7 @@ import {GeoGridIndex} from "../src/modules/geoindex";
 import {loadWmo} from "./utils";
 
 test('getNearestPointsDirty', () => {
-    const centerPoint = new GeoPoint([56.2, 0]);
+    const centerPoint = new GeoPoint([49, 2]);
     const wmoGrid = new GeoGridIndex();
     let nearest = wmoGrid.getNearestPointsDirty(centerPoint, 100);
     expect(() => {
@@ -14,13 +14,14 @@ test('getNearestPointsDirty', () => {
       }).toThrow();
     wmoGrid.data = loadWmo();
     nearest = Array.from(wmoGrid.getNearestPointsDirty(centerPoint, 75, km_to_rad));
-    expect(nearest.length).toEqual(12);
+    expect(nearest.length).toEqual(42);
 });
 
 test('getNearestPoints', () => {
-    const centerPoint = new GeoPoint([55, 0]);
+    const centerPoint = new GeoPoint([49,2]);
     const wmoGrid = new GeoGridIndex();
     wmoGrid.data = loadWmo();
-    const nearest = Array.from(wmoGrid.getNearestPoints(centerPoint, 75, km_to_rad));
-    expect(nearest.length).toEqual(2);
+    const nearest = Array.from(wmoGrid.getNearestPoints(centerPoint, 27, km_to_rad));
+    expect(nearest.length).toEqual(1);
+    expect(nearest[0][0].name).toEqual("07145");
 });

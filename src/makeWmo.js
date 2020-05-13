@@ -2,11 +2,11 @@
 const Geohash = require('ngeohash');
 const Papa = require('papaparse');
 const fs = require('fs');
-const https = require('https');
+const {https} = require('follow-redirects');
 
 const wmoPath = "./src/modules/wmo.json";
-const wmoURL = "https://raw.githubusercontent.com/flyingeek/editolido/gh-pages/ext-sources/nsd_bbsss.txt";
-const volaURL = "https://raw.githubusercontent.com/flyingeek/editolido/gh-pages/ext-sources/vola_legacy_report.txt";
+const wmoURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/nsd_bbsss.txt";
+const volaURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/vola_legacy_report.txt";
 
 /**
  * Promise to vola importer
@@ -25,14 +25,15 @@ function volaRequest(url) {
         const parsed = Papa.parse(data);
         const results = {};
         const normalize = (v) => {
-          const orientation = v[-1];
+          const orientation = v.slice(-1);
           const sign = ('SW'.indexOf(orientation) >= 0) ? -1 : 1;
           let coords = ('NEWS'.indexOf(orientation) >=0) ? v.slice(0, -1) : v;
           coords += ' 0 0'  // ensure missing seconds or minutes are 0
           const [degrees, minutes, seconds] = coords.split(' ', 3).map(parseFloat);
           return sign * (degrees + (minutes / 60) + (seconds / 3600));
         };
-        parsed.data.forEach((row) => {
+        let counter = 0;
+        parsed.data.slice(1).forEach((row) => {
           if (row.length < 28) return;
           const wid = row[5];
           if (!wid) return;
@@ -42,7 +43,9 @@ function volaRequest(url) {
             normalize(row[8]),
             row[28].split(", ")
           ]
+          counter += 1;
         });
+        console.log(`${counter} vola stations`);
         resolve(results);
       })
     });
@@ -66,13 +69,14 @@ function wmoRequest(url) {
         const parsed = Papa.parse(data);
         const results = [];
         const normalize = (v) => {
-          const orientation = v[-1];
+          const orientation = v.slice(-1);
           const sign = ('SW'.indexOf(orientation) >= 0) ? -1 : 1;
           let coords = ('NEWS'.indexOf(orientation) >=0) ? v.slice(0, -1) : v;
           coords += '-0-0'  // ensure missing seconds or minutes are 0
           const [degrees, minutes, seconds] = coords.split('-', 3).map(parseFloat);
           return sign * (degrees + (minutes / 60) + (seconds / 3600));
         };
+        let counter = 0;
         parsed.data.forEach((row) => {
           if (row.length < 8) return;
           // wid, name, lon, lat
@@ -82,12 +86,16 @@ function wmoRequest(url) {
             normalize(row[8]),
             normalize(row[7])
           ]);
+          counter += 1;
         });
+        console.log(`${counter} wmo stations`);
         resolve(results);
       })
     });
   });
 }
+
+let counter = 0;
 
 /**
  * Merge importers
@@ -119,16 +127,20 @@ async function mergeData() {
         const [volaLon, volaLat, remarks] = volaData[wid];
         if (['CYMT'].indexOf(name) >= 0) continue;
         if (remarks.indexOf("GOS") < 0) continue;
-        if (Math.round(volaLon, 1) !== Math.round(lon, 1) || Math.round(volaLat, 1) !== Math.round(lat, 1)) {
+        if (Math.abs(volaLon - lon) > 0.1 || Math.abs(volaLat - lat) > 0.1) {
           continue;
         }
         wmo.push(wid);
         addData(name, lat, lon);
+        counter += 1;
       }
     }
     for (const [wid, [lon, lat, remarks]] of Object.entries(volaData)) {
-      if ((wid in wmo === false) && (wid in ['71822'] === false) && ("GOS" in remarks === false)) {
+      if ((wmo.indexOf(wid) < 0) && (['71822'].indexOf(wid) < 0) && (remarks.indexOf("GOS") >= 0)) {
         addData(wid, lat, lon);
+        counter += 1;
+      } else {
+        //console.log(remarks);
       }
     }
   })
@@ -140,7 +152,7 @@ mergeData().then(data => {
     if (err) {
       throw err;
     } else {
-      console.log('Saved!');
+      console.log(`Saved ${counter} stations!`);
     }
   });
 });
