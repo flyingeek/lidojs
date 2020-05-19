@@ -57,7 +57,7 @@ export class Ofp {
 
   get description() {
     const infos = this.infos;
-    return `${infos.flight} ${infos.departure}-${infos.destination} ${infos.date} " "${infos.datetime.toISOString().substring(11,16)}z OFP ${infos.ofp}`;
+    return `${infos.flight} ${infos.departure}-${infos.destination} ${infos.date} ${infos.datetime.toISOString().substring(11,16)}z OFP ${infos.ofp}`;
   }
 
   /**

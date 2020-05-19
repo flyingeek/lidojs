@@ -93,6 +93,7 @@ class KMLGenerator {
         this.iconTemplate = renderers.iconTemplate || iconTemplate;
         this.segmentTemplate = renderers.segmentTemplate || segmentTemplate;
         this.icons = renderers.icons || GOOGLEICONS;
+        this.name = undefined;
     }
 
     /**
@@ -243,19 +244,24 @@ class KMLGenerator {
      */
     render(options={}){
         let styles = '';
+        const renderIconTemplate = options.iconTemplate || this.iconTemplate;
+        const renderStyleTemplate = options.styleTemplate || this.styleTemplate;
+        const renderTemplate = options.template || this.template;
+        const renderIcons = options.icons || this.icons;
         PINS.forEach((value, index) => {
             if (index !== 0) {
-                value = {'id': PINS[index].slice(1), 'href': this.icons[index]};
-                styles += this.iconTemplate({...value, ...options});
+                value = {'id': PINS[index].slice(1), 'href': renderIcons[index]};
+                styles += renderIconTemplate({...value, ...options});
             }
         });
 
         for (let [,folder] of this.folders){
             if (folder.enabled) {
-                styles += this.styleTemplate(folder.lineStyle)
+                styles += renderStyleTemplate(folder.lineStyle)
             }
         }
-        return this.template({...options, "styles": styles, "folders": this.renderFolders()});
+        if (!options.name) options.name = this.name;
+        return renderTemplate({...options, "styles": styles, "folders": this.renderFolders()});
     }
 
     /**
@@ -352,6 +358,13 @@ class KMLGenerator {
         }
     }
 
+    /**
+     * set the default name inserted in template
+     * @param {string} name the name/description
+     */
+    setName(name) {
+        this.name = name;
+    }
 }
 
 export {KMLGenerator};
