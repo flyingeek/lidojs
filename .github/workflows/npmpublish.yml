@@ -46,3 +46,26 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Build application
+        run: npm run build
+      - name: upload lidojs.js
+        uses: actions-github/upload-to-release@master
+        with:
+          file: './dist/lidojs.js'
+          type: 'text/javascript'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: upload lidojs.min.js
+        uses: actions-github/upload-to-release@master
+        with:
+          file: './dist/lidojs.min.js'
+          type: 'text/javascript'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: upload lidojs.var.min.js
+        uses: actions-github/upload-to-release@master
+        with:
+          file: './dist/lidojs.var.min.js'
+          type: 'text/javascript'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
