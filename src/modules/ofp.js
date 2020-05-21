@@ -68,8 +68,8 @@ export class Ofp {
    */
   wptCoordinates(start="", end="") {
     const infos = this.infos;
-    let extract = ((start === "") ? `${infos.departure}  N` : "") + this.text.extract(
-      (start === "") ? `----${infos.departure}  N` : start,
+    let extract = ((start === "") ? `${infos.departure}  ` : "") + this.text.extract(
+      (start === "") ? `----${infos.departure}  ` : start,
       (end === "") ? "Generated" : end
     );
     // noinspection JSValidateTypes
@@ -84,8 +84,8 @@ export class Ofp {
    */
   wptCoordinatesAlternate(start="", end="") {
     const infos = this.infos;
-    let extract = ((start === "") ? `${infos.destination}  N` : "") + this.text.extract(
-      (start === "") ? `----${infos.destination}  N` : start,
+    let extract = ((start === "") ? `${infos.destination}  ` : "") + this.text.extract(
+      (start === "") ? `----${infos.destination}  ` : start,
       (end === "") ? "--WIND" : end
     );
     // noinspection JSValidateTypes
@@ -247,96 +247,98 @@ export class Ofp {
   }
 
   lidoRoute() {
-    const points = [];
-    const rawPoints = [];
-    this.route.points.forEach((p) => {
-      rawPoints.push(p.dm);
-      if (p.name === "" || (/\d+/u).exec(p.name) !== null) {
-        points.push(p.dm);
-      } else {
-        points.push(p.name);
+    return this.cache("lidoRoute", () => {
+      const points = [];
+      const rawPoints = [];
+      this.route.points.forEach((p) => {
+        rawPoints.push(p.dm);
+        if (p.name === "" || (/\d+/u).exec(p.name) !== null) {
+          points.push(p.dm);
+        } else {
+          points.push(p.name);
+        }
+      });
+      let lidoPoints = [];
+
+      let fplRoute = this.fplRoute;
+      let fplRouteLenght = fplRoute.length;
+      if (fplRouteLenght < 2) {
+        return points;
       }
+      let departure = fplRoute[0];
+      let destination = fplRoute[fplRouteLenght - 1];
+      let innerFplRoute = fplRoute.slice(1, -1);
+      let innerFplRouteLength = innerFplRoute.length;
+
+      // replace points by rawPoint before first common waypoint
+      for (let i = 0; i < innerFplRouteLength; i += 1 ) {
+        let p = innerFplRoute[i];
+        let offset = points.indexOf(p);
+        if (offset !== -1) {
+          lidoPoints = rawPoints.slice(1, offset).concat(innerFplRoute.slice(i));
+          break;
+        }
+      }
+
+      // replace points after last common waypoint by rawPoints
+      let reversedPoints = points.slice().reverse(); // copy before reverse
+      let reversedLidoRoute = lidoPoints.slice().reverse();
+      let lidoRouteLength = lidoPoints.length;
+      for (let i = 0; i < lidoRouteLength; i += 1 ) {
+        let p = reversedLidoRoute[i];
+        let offset = reversedPoints.indexOf(p);
+        if (offset !== -1) {
+          if (i > 0) {
+            lidoPoints = lidoPoints.slice(0, -i);
+          }
+          lidoPoints = lidoPoints.concat(rawPoints.slice(-offset, -1));
+          break;
+        }
+      }
+      // replace known tracks (NATA, NATB...) by track_points
+      /**
+       * When there is a FL or Speed change, we may have multiple
+       * "NATW" in the FPL, so change them all.
+       * @param fplPoints: [] - an array of fplPoints
+       * @param needle: string
+       * @param trackPoints
+       * @returns {[]}
+       */
+      const recursiveNatReplace = function (fplPoints, needle, trackPoints) {
+        let match = [];
+        // infinite loop (while(true) breaks in browser)
+        // https://stackoverflow.com/questions/24977456/how-do-i-create-an-infinite-loop-in-javascript
+        for (;;) {
+          let offset = fplPoints.indexOf(needle);
+          if (offset === -1) {
+            return match;
+          }
+          fplPoints.splice(offset, 1, ...trackPoints.slice(
+            trackPoints.indexOf(fplPoints[offset - 1]) +1,
+            trackPoints.indexOf(fplPoints[offset + 1])));
+          match = fplPoints;
+        }
+      };
+
+      this.tracks.forEach( (track) => {
+        if (track.isMine) {
+          let letter = track.name.slice(-1);
+          let results = recursiveNatReplace(
+            lidoPoints,
+            Track.label(letter),
+            track.points.map((p) => p.name)
+          );
+          if (results.length > 0) {
+            lidoPoints = results;
+          }
+        }
+      });
+      lidoPoints.push(destination);
+      lidoPoints.unshift(departure);
+      // adds alternates and ralts
+      lidoPoints = lidoPoints.concat(...this.infos.alternates);
+      lidoPoints= lidoPoints.concat(...this.infos.ralts);
+      return lidoPoints;
     });
-    let lidoPoints = [];
-
-    let fplRoute = this.fplRoute;
-    let fplRouteLenght = fplRoute.length;
-    if (fplRouteLenght < 2) {
-      return points;
-    }
-    let departure = fplRoute[0];
-    let destination = fplRoute[fplRouteLenght - 1];
-    let innerFplRoute = fplRoute.slice(1, -1);
-    let innerFplRouteLength = innerFplRoute.length;
-
-    // replace points by rawPoint before first common waypoint
-    for (let i = 0; i < innerFplRouteLength; i += 1 ) {
-      let p = innerFplRoute[i];
-      let offset = points.indexOf(p);
-      if (offset !== -1) {
-        lidoPoints = rawPoints.slice(1, offset).concat(innerFplRoute.slice(i));
-        break;
-      }
-    }
-
-    // replace points after last common waypoint by rawPoints
-    let reversedPoints = points.slice().reverse(); // copy before reverse
-    let reversedLidoRoute = lidoPoints.slice().reverse();
-    let lidoRouteLength = lidoPoints.length;
-    for (let i = 0; i < lidoRouteLength; i += 1 ) {
-      let p = reversedLidoRoute[i];
-      let offset = reversedPoints.indexOf(p);
-      if (offset !== -1) {
-        if (i > 0) {
-          lidoPoints = lidoPoints.slice(0, -i);
-        }
-        lidoPoints = lidoPoints.concat(rawPoints.slice(-offset, -1));
-        break;
-      }
-    }
-    // replace known tracks (NATA, NATB...) by track_points
-    /**
-     * When there is a FL or Speed change, we may have multiple
-     * "NATW" in the FPL, so change them all.
-     * @param fplPoints: [] - an array of fplPoints
-     * @param needle: string
-     * @param trackPoints
-     * @returns {[]}
-     */
-    const recursiveNatReplace = function (fplPoints, needle, trackPoints) {
-      let match = [];
-      // infinite loop (while(true) breaks in browser)
-      // https://stackoverflow.com/questions/24977456/how-do-i-create-an-infinite-loop-in-javascript
-      for (;;) {
-        let offset = fplPoints.indexOf(needle);
-        if (offset === -1) {
-          return match;
-        }
-        fplPoints.splice(offset, 1, ...trackPoints.slice(
-          trackPoints.indexOf(fplPoints[offset - 1]) +1,
-          trackPoints.indexOf(fplPoints[offset + 1])));
-        match = fplPoints;
-      }
-    };
-
-    this.tracks.forEach( (track) => {
-      if (track.isMine) {
-        let letter = track.name.slice(-1);
-        let results = recursiveNatReplace(
-          lidoPoints,
-          Track.label(letter),
-          track.points.map((p) => p.name)
-        );
-        if (results.length > 0) {
-          lidoPoints = results;
-        }
-      }
-    });
-    lidoPoints.push(destination);
-    lidoPoints.unshift(departure);
-    // adds alternates and ralts
-    lidoPoints = lidoPoints.concat(...this.infos.alternates);
-    lidoPoints= lidoPoints.concat(...this.infos.ralts);
-    return lidoPoints;
   }
 }

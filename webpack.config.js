@@ -1,6 +1,5 @@
 const path = require('path');
 // const config = require('./package.json');
-const CopyPlugin = require('copy-webpack-plugin');
 // eslint-disable-next-line require-jsdoc
 function createConfig(options) {
   const targetExtension = (options.target === "umd") ? "" : "." + options.target;
@@ -18,6 +17,21 @@ function createConfig(options) {
       "filename": 'lidojs' + targetExtension + minExtension + '.js',
       "library": 'editolido',
       "libraryTarget": options.target
+    },
+    "module": {
+      "rules": [
+        {
+          "test": /\.m?js$/u,
+          "exclude": /(node_modules|bower_components)/u,
+          "use": {
+            "loader": 'babel-loader',
+            "options": {
+              "presets": ['@babel/preset-env'],
+              "plugins": ['@babel/plugin-transform-named-capturing-groups-regex']
+            }
+          }
+        }
+      ]
     }
   };
 }
@@ -26,14 +40,4 @@ module.exports = [
   createConfig({"target": "var", "minimize": false}),
   createConfig({"target": "umd", "minimize": true}),
   createConfig({"target": "umd", "minimize": false}),
-  {
-    "mode": "production",
-    "plugins": [
-      new CopyPlugin(
-        [
-          {"from": './src/modules/wmo.json', "to": 'wmo.json'},
-        ],
-      ),
-    ]
-  },
 ];

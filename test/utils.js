@@ -9,7 +9,7 @@ export const loadDataAsString = function(filename) {
 };
 
 export const loadWmo = function() {
-  const dataPath = path.resolve(__dirname, '../src/modules');
+  const dataPath = path.resolve(__dirname, '../dist');
   // eslint-disable-next-line no-sync
   const data = fs.readFileSync(path.resolve(dataPath, "wmo.json"), 'utf8');
   return JSON.parse(data)

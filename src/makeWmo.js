@@ -4,7 +4,7 @@ const Papa = require('papaparse');
 const fs = require('fs');
 const {https} = require('follow-redirects');
 
-const wmoPath = "./src/modules/wmo.json";
+const wmoPath = "./dist/wmo.json";
 const wmoURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/nsd_bbsss.txt";
 const volaURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/vola_legacy_report.txt";
 
