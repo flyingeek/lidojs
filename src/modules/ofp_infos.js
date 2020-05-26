@@ -11,6 +11,7 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - datetime (a javascript Date object for scheduled departure block time)
  - date (OFP text date 25Apr2016)
  - datetime2 (a javascript Date object for scheduled arrival landing time)
+ - duration [hours, minutes] hours and minutes are Number
  - ofp (OFP number 9/0/1)
  - alternates an array of alternate
  - ralts an array of route alternates (ETOPS)
@@ -76,9 +77,9 @@ function ofpInfos(text) {
   const rawFS = text.extract("FLIGHT SUMMARY", "Generated");
   pattern = /\s(\d{2})(\d{2})\s+TAXI IN/u;
   match = pattern.exec(rawFS);
-  let taxitime = 0;
+  let taxitime = 15;
   if (match === null) {
-    console.log("taxitime not found, arbitrary set to 0");
+    console.log("taxitime not found, arbitrary set to 15mn");
   } else {
     taxitime = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
   }

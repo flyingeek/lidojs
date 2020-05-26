@@ -1,6 +1,6 @@
 {
   "name": "@flyingeek/lidojs",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "convert Lido OFP text files",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
@@ -13,7 +13,9 @@
     "preinstall": "npx npm-force-resolutions",
     "lint": "eslint src/**",
     "test": "jest test",
+    "testwmo": "jest testwmo",
     "test-w": "jest --watch test",
+    "testwmo-w": "jest --watch testwmo",
     "clean": "rimraf dist/**",
     "coverage": "jest --collectCoverageFrom=src/**.js --coverage src",
     "build": "webpack",

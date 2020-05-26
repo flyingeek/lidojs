@@ -273,12 +273,13 @@ class GeoPoint {
         const phi1 = this.latphi.phi;
         const rlat2 = other.latphi.rlat;
         const phi2 = other.latphi.phi;
-        return Math.fmod(
+        const fmod = (a, b) => Number((a - (Math.floor(a / b) * b)).toPrecision(8));
+        return fmod(
             Math.atan2(
                 Math.sin(phi1 - phi2) * Math.cos(rlat2),
                 Math.cos(rlat1) * Math.sin(rlat2) - Math.sin(rlat1) * Math.cos(rlat2) * Math.cos(phi1 - phi2)
             ),
-            2 * Math.pi
+            2 * Math.PI
         );
     }
 

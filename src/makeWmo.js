@@ -5,6 +5,7 @@ const fs = require('fs');
 const {https} = require('follow-redirects');
 
 const wmoPath = "./dist/wmo.json";
+const wmoVarPath = "./dist/wmo.var.js";
 const wmoURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/nsd_bbsss.txt";
 const volaURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/vola_legacy_report.txt";
 
@@ -153,6 +154,11 @@ mergeData().then(data => {
       throw err;
     } else {
       console.log(`Saved ${counter} stations!`);
+    }
+  });
+  fs.writeFile(wmoVarPath, `var WMO=${JSON.stringify(data)};\n`, (err) => {
+    if (err) {
+      throw err;
     }
   });
 });

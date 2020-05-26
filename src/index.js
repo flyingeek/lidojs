@@ -5,3 +5,4 @@ export {avenzaIconTemplate, avenzaStyleTemplate, avenzaTemplate, iconTemplate, s
 export {KMLGenerator} from "./modules/kml";
 export {Ofp} from "./modules/ofp";
 export {GEO_HASH_GRID_SIZE, GeoGridIndex} from "./modules/geoindex";
+export {ogimetRoute, ogimetData} from "./modules/ogimet";
