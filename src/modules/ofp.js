@@ -66,13 +66,10 @@ export class Ofp {
    * @param end the end marker for end (useful for tests)
    * @returns {GeoPoint[]}
    */
-  wptCoordinates(start="", end="") {
+  wptCoordinates(start="WPT COORDINATES") {
     const infos = this.infos;
-    let extract = ((start === "") ? `${infos.departure}  ` : "") + this.text.extract(
-      (start === "") ? `----${infos.departure}  ` : start,
-      (end === "") ? "Generated" : end
-    );
-    // noinspection JSValidateTypes
+    const end = (this.ofpType === ofpTypes.NVP) ? '----' + infos['destination']: '----';
+    const extract = this.text.extract(start, end);
     return extract.matchAll(wptRegExp);
   }
 
@@ -82,14 +79,17 @@ export class Ofp {
    * @param end the end marker for end (useful for tests)
    * @returns {GeoPoint[]}
    */
-  wptCoordinatesAlternate(start="", end="") {
-    const infos = this.infos;
-    let extract = ((start === "") ? `${infos.destination}  ` : "") + this.text.extract(
-      (start === "") ? `----${infos.destination}  ` : start,
-      (end === "") ? "--WIND" : end
-    );
-    // noinspection JSValidateTypes
-    return extract.matchAll(wptRegExp);
+  wptCoordinatesAlternate(start='WPT COORDINATES', end_is_optional=false) {
+
+    const end = (this.ofpType === ofpTypes.NVP) ? '--WIND INFORMATION--': 'ATC FLIGHT PLAN';
+    // take only what is after the last '----' (python rsplit)
+    // eslint-disable-next-line require-jsdoc
+    function reverse(str) {
+      return [...str].reverse().join('');
+    }
+    const t = this.text.extract(start, end, end_is_optional)
+    const extract = reverse(t).split('----', 1)[0];
+    return reverse(extract).matchAll(wptRegExp);
   }
 
   /**
@@ -109,7 +109,7 @@ export class Ofp {
     let extract = "";
     try {
       extract = this.text
-        .extract("TRACKSNAT", "NOTES:");
+        .extract("ATC FLIGHT PLAN", "NOTES:").extract(')');
     } catch (e) {
       return [];
     }
@@ -125,8 +125,9 @@ export class Ofp {
       for (let i = 0, max = a.length; i < max; i += 2) {
         results.push([a[i], a[i + 1]]);
       }
-    } else {
+    } else if (extract.includes('TRACKS')) {
       console.error("Unknown TRACKSNAT message format");
+      console.log(extract);
     }
     return results;
   }
