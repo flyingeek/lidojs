@@ -76,3 +76,10 @@ jobs:
           type: 'application/json'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: upload wmo.var.js
+        uses: actions-github/upload-to-release@master
+        with:
+          file: './dist/wmo.var.js'
+          type: 'text/javascript'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
