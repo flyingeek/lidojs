@@ -12,7 +12,7 @@ wmoGrid.data = loadWmo();
 
 
 test('ogimetRoute', () => {
-  const ogirte = ogimetRoute(wmoGrid, ofp.route, 300, "ogimet route");
+  const ogirte = ogimetRoute(wmoGrid, ofp.route);
   const names = ogirte.points
                 .filter(p => p.name !== "")
                 .map(p => p.name)

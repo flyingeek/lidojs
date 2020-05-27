@@ -9,7 +9,7 @@ import {Route} from "./route";
  * @param {string} name the name of the returned route
  * @param {string} description the description of the returned route
  */
-export function ogimetRoute(wmoGrid, route, segmentSize=300, name="", description="") {
+export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSize=300, algorithm='xtd'} = {}) {
     const neighbourRadius = (rad_to_km(wmoGrid.gridSize) / 2.0) - 0.1
 
     const getNeighbour = (point) => {
@@ -119,8 +119,9 @@ export function ogimetRoute(wmoGrid, route, segmentSize=300, name="", descriptio
     ogimetResults = ogimetResults.filter((r) => o_index[r.ogimet.name][1] == r.fpl);
     ogimetResults = filterByXtd(ogimetResults);
     //console.log(ogimetResults.length);
+    const reduceFn = (algorithm === 'xtd' ? lowestXtdIndex: lowestCrsIndex);
     while (ogimetResults.length > 21) {
-        const idx = lowestXtdIndex(ogimetResults);
+        const idx = reduceFn(ogimetResults);
         ogimetResults = ogimetResults.slice(0, idx).concat(ogimetResults.slice(idx + 1));
     }
     return new Route(ogimetResults.map((r) => r.ogimet))
@@ -132,7 +133,7 @@ export function ogimetRoute(wmoGrid, route, segmentSize=300, name="", descriptio
  * @param {editolido.OFP} ofp the OFP
  * @param {editolido.GeoGridIndex} wmoGrid  the loaded Grid
  */
-export function ogimetData(ofp, wmoGrid) {
+export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     // timestamp for departure
     const taxitime = ofp.infos['taxitime'];
     const ts = (ofp.infos['datetime'].valueOf() / 1000) + (taxitime * 60);
@@ -150,7 +151,7 @@ export function ogimetData(ofp, wmoGrid) {
     if (levels && levels.length) {
         fl = Math.round(levels.reduce((a, b) => a + b, 0) / levels.length);
     }
-    const route = ogimetRoute(wmoGrid, ofp.route, 300, name);
+    const route = ogimetRoute(wmoGrid, ofp.route,{name, algorithm});
     const labels = route.points.filter(p => p.name !== "").map(p => p.name);
     route.description = labels.join(' ');
     const url = `http://www.ogimet.com/display_gramet.php?lang=en&hini=${hini}&tref=${tref}&hfin=${hfin}&fl=${fl}&hl=3000&aero=yes&wmo=${labels.join('_')}&submit=submit`;
