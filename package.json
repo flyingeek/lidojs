@@ -1,6 +1,6 @@
 {
   "name": "@flyingeek/lidojs",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "convert Lido OFP text files",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
@@ -10,7 +10,6 @@
   "license": "ISC",
   "repository": "https://github.com/flyingeek/lidojs",
   "scripts": {
-    "preinstall": "npx npm-force-resolutions",
     "lint": "eslint src/**",
     "test": "jest test",
     "testwmo": "jest testwmo",
@@ -30,9 +29,6 @@
     "last 2 firefox versions",
     "last 2 ios versions"
   ],
-  "resolutions": {
-    "minimist": "^1.2.5"
-  },
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/plugin-transform-named-capturing-groups-regex": "^7.8.3",
@@ -47,7 +43,7 @@
     "follow-redirects": "^1.11.0",
     "jest": "^25.2.1",
     "ngeohash": "^0.6.3",
-    "papaparse": "^5.1.1",
+    "papaparse": "^5.2.0",
     "regenerator-runtime": "^0.13.5",
     "rimraf": "^3.0.2",
     "webpack": "^4.42.1",
