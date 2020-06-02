@@ -1,7 +1,9 @@
+/* eslint-disable no-sync */
 /*eslint no-continue: 0*/
 const Geohash = require('ngeohash');
 const Papa = require('papaparse');
 const fs = require('fs');
+const path = require('path');
 const {https} = require('follow-redirects');
 
 const wmoPath = "./dist/wmo.json";
@@ -147,6 +149,8 @@ async function mergeData() {
   })
   return data;
 }
+
+fs.mkdirSync(path.dirname(wmoPath), {'recursive': true});
 
 mergeData().then(data => {
   fs.writeFile(wmoPath, JSON.stringify(data), (err) => {
