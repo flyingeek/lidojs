@@ -1,5 +1,6 @@
 const path = require('path');
-// const config = require('./package.json');
+const webpack = require('webpack');
+const config = require('./package.json');
 // eslint-disable-next-line require-jsdoc
 function createConfig(options) {
   const targetExtension = (options.target === "umd") ? "" : "." + options.target;
@@ -32,8 +33,13 @@ function createConfig(options) {
           }
         }
       ]
-    }
-  };
+    },
+    "plugins": [
+      new webpack.DefinePlugin({
+        'VERSION': JSON.stringify(config.version)
+      })
+    ]
+  }
 }
 module.exports = [
   createConfig({"target": "var", "minimize": true}),
