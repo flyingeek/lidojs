@@ -7,6 +7,7 @@ function createConfig(options) {
   const minExtension = (options.minimize === true) ? ".min" : "";
   return {
     "mode": "production",
+    "devtool": 'source-map',
     "optimization": {
       "minimize": options.minimize
     },
