@@ -154,9 +154,9 @@ function ofpInfos(text) {
     "EXP": null
   }
   try {
-    infos['raltPoints'] = ralts.map(v => new GeoPoint(AIRPORTS[v], {'name': v}));
-    if (eep) infos['EEP'] = new GeoPoint(AIRPORTS[eep], {'name': eep});
-    if (exp) infos['EXP'] = new GeoPoint(AIRPORTS[exp], {'name': exp});
+    infos['raltPoints'] = ralts.map(v => new GeoPoint(AIRPORTS[v], {'name': v, 'description': 'ETOPS'}));
+    if (eep) infos['EEP'] = new GeoPoint(AIRPORTS[eep], {'name': eep, 'description': 'EEP'});
+    if (exp) infos['EXP'] = new GeoPoint(AIRPORTS[exp], {'name': exp, 'description': 'EXP'});
   } catch (err) {
     console.log(err);
   }
