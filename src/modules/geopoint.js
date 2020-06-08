@@ -346,6 +346,7 @@ class GeoPoint {
         for (let i = 0; i < steps; i += 1) {
             points.push(destination(radius, i * 2 * Math.PI / steps));
         }
+        points.push(points[0]); // close circle
         return points;
     }
 

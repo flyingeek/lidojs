@@ -175,5 +175,5 @@ test("getCenter", () => {
 
 test("circle", () => {
   const g = new GeoPoint([0, 90]);
-  expect(g.circle(420).length).toEqual(64);
+  expect(g.circle(420).length).toEqual(65);
 })
