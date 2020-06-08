@@ -73,7 +73,7 @@ function ofpInfos(text) {
   match = pattern.exec(rawFplText);
   let ralts = [];
   if (match !== null) {
-    ralts.push(match[1].split(/\s/u));
+    ralts = match[1].trim().split(/\s/u);
   }
 
   const rawFS = text.extract("FLIGHT SUMMARY", "Generated");
