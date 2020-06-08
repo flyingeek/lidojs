@@ -27,6 +27,7 @@ test("infos", () => {
   expect(infos.taxitime).toEqual(24);
   expect(infos.ralts).toEqual([]);
   expect(infos.alternates).toEqual(["KBOS"]);
+  expect(infos.aircraft).toEqual("380");
 });
 
 test("fpl", () => {

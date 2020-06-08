@@ -84,6 +84,39 @@ function ofpInfos(text) {
     taxitime = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
   }
 
+  //aircraft type
+  let aircraft = "???";
+  const aircraftTypes = { // convert to Oliver Ravet codes
+    'A388': '380',
+    'B772': '772',
+    'B773': '773',
+    'B77W': '773',
+    'B77L': '77F',
+    'B788': '787',
+    'B789': '787',
+    'B78X': '787',
+    'A318': '318',
+    'A319': '319',
+    'A320': '320',
+    'A321': '321',
+    'A332': '330',
+    'A333': '330',
+    'A338': '330',
+    'A339': '330',
+    'A342': '340',
+    'A343': '340',
+    'A344': '340',
+    'A345': '340',
+    'A346': '340',
+    'A359': '350',
+    'A35K': '350'
+  }
+  pattern = /-([AB][0-9]{2}.)\//u
+  match = pattern.exec(rawFplText);
+  if (match) {
+      aircraft = aircraftTypes[match[1]] || '???';
+  }
+
   return {
     "flight": flight.replace(/\s/gu, ""),
     "departure": departure,
@@ -96,7 +129,8 @@ function ofpInfos(text) {
     "alternates": alternates,
     "ralts": ralts,
     "taxitime": taxitime,
-    "rawfpl": rawFplText
+    "rawfpl": rawFplText,
+    "aircraft": aircraft
   }
 }
 export {ofpInfos};
