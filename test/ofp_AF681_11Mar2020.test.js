@@ -23,4 +23,5 @@ test("infos", () => {
     expect(infos.EEP.name).toEqual("CYYT");
     expect(infos.EXP.name).toEqual("EINN");
     expect(infos.raltPoints.map(v => v.name)).toEqual(['LPLA','EINN']);
+    expect(infos.ETOPS).toEqual(180);
   });

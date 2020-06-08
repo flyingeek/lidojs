@@ -19,6 +19,10 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - ralts an array of route alternates (ETOPS)
  - taxitime (departure taxi time in mn)
  - rawfpl the raw text of the FPL
+ - EEP the  ETOPS entry GeoPoint
+ - EXP the ETOPS exit GeoPoint
+ - raltPoints the ETOPS airports as GeoPoint
+ - ETOPS the ETOPS time in minutes
  * @param text The OFP in text format
  * @returns {{duration: number[], flight: string, datetime: Date, taxitime: number, destination: string, ofp: string, ralts: [], departure: string, alternates: [], rawfpl: string}}
  */
@@ -122,7 +126,13 @@ function ofpInfos(text) {
   let exp;
   // eslint-disable-next-line init-declarations
   let eep;
+  let etopsTime = 0;
   if (ralts.length > 0) {
+      pattern = /ETOPS\s+(\d{3})\s/u
+      match = pattern.exec(rawFS);
+      if (match) {
+        etopsTime = parseInt(match[1], 10);
+      }
       const etopsSummary = text.extract("ETOPS SUMMARY", "Generated");
       pattern = /EEP\((\S{4})\)/u;
       match = pattern.exec(etopsSummary);
@@ -151,7 +161,8 @@ function ofpInfos(text) {
     "rawfpl": rawFplText,
     "aircraft": aircraft,
     "EEP": null,
-    "EXP": null
+    "EXP": null,
+    "ETOPS": etopsTime
   }
   try {
     infos['raltPoints'] = ralts.map(v => new GeoPoint(AIRPORTS[v], {'name': v, 'description': 'ETOPS'}));
