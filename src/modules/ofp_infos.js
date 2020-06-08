@@ -132,6 +132,15 @@ function ofpInfos(text) {
       match = pattern.exec(rawFS);
       if (match) {
         etopsTime = parseInt(match[1], 10);
+      } else {
+        try {
+          match = pattern.exec('FPL SUMMARY', 'Generated');
+          if (match) {
+            etopsTime = parseInt(match[1], 10);
+          }
+        } catch (err) {
+          console.log("ETOPS range not found");
+        }
       }
       const etopsSummary = text.extract("ETOPS SUMMARY", "Generated");
       pattern = /EEP\((\S{4})\)/u;
