@@ -172,3 +172,8 @@ test("getCenter", () => {
   center = GeoPoint.getCenter([g1, g2, g3]);
   expect(center.equals(new GeoPoint([45.5, 0])));
 });
+
+test("circle", () => {
+  const g = new GeoPoint([0, 90]);
+  expect(g.circle(420).length).toEqual(64);
+})

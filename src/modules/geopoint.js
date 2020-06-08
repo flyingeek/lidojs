@@ -13,6 +13,7 @@ const nm_to_rad = (nm) => nm * NM / R;
 const km_to_rad = (km) => km * 1000.0 / R;
 const km_to_nm = (km) => km * 1000.0 / NM;
 
+const fmod = (a, b) => Number((a - (Math.floor(a / b) * b)).toPrecision(8));
 /**
  * convert geo coordinates in degrees, minutes in signed fixed value
  *  N5500.0 => 55.00000000
@@ -273,7 +274,6 @@ class GeoPoint {
         const phi1 = this.latphi.phi;
         const rlat2 = other.latphi.rlat;
         const phi2 = other.latphi.phi;
-        const fmod = (a, b) => Number((a - (Math.floor(a / b) * b)).toPrecision(8));
         return fmod(
             Math.atan2(
                 Math.sin(phi1 - phi2) * Math.cos(rlat2),
@@ -322,6 +322,31 @@ class GeoPoint {
         const rlat = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)));
         const phi = Math.atan2(y, x);
         return new GeoPoint(new LatPhi(rlat, phi).asLatLng);
+    }
+
+    /**
+     * Return points forming a circle around current points
+     * @param {int} radius distance in radians
+     * @param {int} steps number of points in the circle
+     * @param {function} converter converter to use for the radius
+     */
+    circle(radius, steps=64, converter=nm_to_rad) {
+        if (converter) radius = converter(radius);
+        const destination = (d, tc) => {
+            const lat1 = this.latphi.rlat;
+            const lon1 = this.latphi.phi;
+            const rlat = Math.asin(Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) *Math.sin(d) * Math.cos(tc));
+            let phi = lon1;
+            if (Math.cos(rlat) !== 0) {
+                phi = fmod(lon1 - Math.asin(Math.sin(tc) * Math.sin(d) / Math.cos(rlat)) +Math.PI, 2 * Math.PI) - Math.PI;
+            }
+            return new GeoPoint(new LatPhi(rlat, phi).asLatLng);
+        }
+        const points = [];
+        for (let i = 0; i < steps; i += 1) {
+            points.push(destination(radius, i * 2 * Math.PI / steps));
+        }
+        return points;
     }
 
     equals(other){
