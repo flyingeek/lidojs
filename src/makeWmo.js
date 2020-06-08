@@ -160,7 +160,8 @@ mergeData().then(data => {
       console.log(`Saved ${counter} stations!`);
     }
   });
-  fs.writeFile(wmoVarPath, `var WMO=${JSON.stringify(data)};\n`, (err) => {
+  // according to Google engineers, JSON.parse is faster than the native js parsing
+  fs.writeFile(wmoVarPath, `var WMO=JSON.parse('${JSON.stringify(data)}');\n`, (err) => {
     if (err) {
       throw err;
     }
