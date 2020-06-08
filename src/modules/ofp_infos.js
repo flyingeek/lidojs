@@ -1,5 +1,7 @@
 /* eslint-disable max-lines-per-function */
 
+import {GeoPoint} from './geopoint';
+const AIRPORTS = require('./airports');
 
 const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -116,8 +118,24 @@ function ofpInfos(text) {
   if (match) {
       aircraft = aircraftTypes[match[1]] || '???';
   }
-
-  return {
+  // eslint-disable-next-line init-declarations
+  let exp;
+  // eslint-disable-next-line init-declarations
+  let eep;
+  if (ralts.length > 0) {
+      const etopsSummary = text.extract("ETOPS SUMMARY", "Generated");
+      pattern = /EEP\((\S{4})\)/u;
+      match = pattern.exec(etopsSummary);
+      if (match) {
+        eep = match[1];
+      }
+      pattern = /EXP\((\S{4})\)/u;
+      match = pattern.exec(etopsSummary);
+      if (match) {
+        exp = match[1];
+      }
+  }
+  const infos = {
     "flight": flight.replace(/\s/gu, ""),
     "departure": departure,
     "destination": destination,
@@ -128,9 +146,20 @@ function ofpInfos(text) {
     "duration": duration,
     "alternates": alternates,
     "ralts": ralts,
+    "raltPoints": [],
     "taxitime": taxitime,
     "rawfpl": rawFplText,
-    "aircraft": aircraft
+    "aircraft": aircraft,
+    "EEP": null,
+    "EXP": null
   }
+  try {
+    infos['raltPoints'] = ralts.map(v => new GeoPoint(AIRPORTS[v], {'name': v}));
+    if (eep) infos['EEP'] = new GeoPoint(AIRPORTS[eep], {'name': eep});
+    if (exp) infos['EXP'] = new GeoPoint(AIRPORTS[exp], {'name': exp});
+  } catch (err) {
+    console.log(err);
+  }
+  return infos
 }
 export {ofpInfos};
