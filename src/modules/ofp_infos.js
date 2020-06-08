@@ -134,7 +134,7 @@ function ofpInfos(text) {
         etopsTime = parseInt(match[1], 10);
       } else {
         try {
-          match = pattern.exec('FPL SUMMARY', 'Generated');
+          match = pattern.exec(text.extract('FPL SUMMARY', 'Generated'));
           if (match) {
             etopsTime = parseInt(match[1], 10);
           }
