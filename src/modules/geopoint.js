@@ -338,7 +338,9 @@ class GeoPoint {
             const rlat = Math.asin(Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) *Math.sin(d) * Math.cos(tc));
             let phi = lon1;
             if (Math.cos(rlat) !== 0) {
-                phi = fmod(lon1 - Math.asin(Math.sin(tc) * Math.sin(d) / Math.cos(rlat)) +Math.PI, 2 * Math.PI) - Math.PI;
+                phi = Math.asin(Math.sin(tc) * Math.sin(d) / Math.cos(rlat))
+                if (lon1 - phi < - Math.PI) phi = lon1 + Math.PI; // fix PPT ETOPS circle
+                phi = fmod(lon1 - phi + Math.PI, 2 * Math.PI) - Math.PI;
             }
             return new GeoPoint(new LatPhi(rlat, phi).asLatLng);
         }
