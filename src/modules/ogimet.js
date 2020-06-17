@@ -155,5 +155,6 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     const labels = route.points.filter(p => p.name !== "").map(p => p.name);
     route.description = labels.join(' ');
     const url = `http://www.ogimet.com/display_gramet.php?lang=en&hini=${hini}&tref=${tref}&hfin=${hfin}&fl=${fl}&hl=3000&aero=yes&wmo=${labels.join('_')}&submit=submit`;
-    return {tref, name, route, 'wmo': labels, url};
+    const proxy = `${hini}-${tref}-${hfin}-${fl}-${labels.join('_')}`;
+    return {tref, name, route, 'wmo': labels, url, proxy};
 }
