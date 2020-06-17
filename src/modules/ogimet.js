@@ -140,10 +140,10 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     const now_ts = (new Date()).valueOf() / 1000;
     const tref = Math.round(Math.max(ts, now_ts)); //for old ofp timeref=now
     const trefOfp = Math.round(ts);
-    const dateref = new Date(tref * 1000);
+    // const dateref = new Date(tref * 1000); //for caching we use the ofp time instead
     // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
-    const dateTimeFormat = new Intl.DateTimeFormat('en', {'year': '2-digit', 'month': 'short', 'day': '2-digit', 'hour': '2-digit', 'minute': '2-digit'});
-    const [{'value': month},,{'value': day},,{'value': year},,{'value': hour},,{'value': minute}] = dateTimeFormat.formatToParts(dateref);
+    const dateTimeFormat = new Intl.DateTimeFormat('en', {'year': '2-digit', 'month': 'short', 'day': '2-digit', 'hour': '2-digit', 'minute': '2-digit', 'hourCycle': 'h24'});
+    const [{'value': month},,{'value': day},,{'value': year},,{'value': hour},,{'value': minute}] = dateTimeFormat.formatToParts(trefOfp);
     const name = `Route Gramet ${ofp.infos['flight']} ${ofp.infos['departure']}-${ofp.infos['destination']} ${day}${month}${year} ${hour}:${minute}z OFP ${ofp.infos['ofp']}`;
     let hini = 0;
     let hfin = ofp.infos['duration'][0] + 1;
