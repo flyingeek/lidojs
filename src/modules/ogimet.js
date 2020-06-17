@@ -139,6 +139,7 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     const ts = (ofp.infos['datetime'].valueOf() / 1000) + (taxitime * 60);
     const now_ts = (new Date()).valueOf() / 1000;
     const tref = Math.round(Math.max(ts, now_ts)); //for old ofp timeref=now
+    const trefOfp = Math.round(ts);
     const dateref = new Date(tref * 1000);
     // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
     const dateTimeFormat = new Intl.DateTimeFormat('en', {'year': '2-digit', 'month': 'short', 'day': '2-digit', 'hour': '2-digit', 'minute': '2-digit'});
@@ -155,6 +156,6 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     const labels = route.points.filter(p => p.name !== "").map(p => p.name);
     route.description = labels.join(' ');
     const url = `http://www.ogimet.com/display_gramet.php?lang=en&hini=${hini}&tref=${tref}&hfin=${hfin}&fl=${fl}&hl=3000&aero=yes&wmo=${labels.join('_')}&submit=submit`;
-    const proxy = `${hini}-${tref}-${hfin}-${fl}-${labels.join('_')}`;
-    return {tref, name, route, 'wmo': labels, url, proxy};
+    const proxy = `${hini}-${trefOfp}-${hfin}-${fl}-${labels.join('_')}`;
+    return {tref, trefOfp, name, route, 'wmo': labels, url, proxy};
 }
