@@ -40,6 +40,7 @@ export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSiz
     };
 
     const filterByXtd = (results) => {
+        if (results.length === 0) return [];
         const res = [results[0]];
         let i = -1;
         while (i < results.length - 1) {
@@ -139,10 +140,10 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     const ts = (ofp.infos['datetime'].valueOf() / 1000) + (taxitime * 60);
     const now_ts = (new Date()).valueOf() / 1000;
     const tref = Math.round(Math.max(ts, now_ts)); //for old ofp timeref=now
-    const trefOfp = Math.round(ts);
+    const trefOfp = new Date(Math.round(ts) * 1000);
     // const dateref = new Date(tref * 1000); //for caching we use the ofp time instead
     // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
-    const dateTimeFormat = new Intl.DateTimeFormat('en', {'year': '2-digit', 'month': 'short', 'day': '2-digit', 'hour': '2-digit', 'minute': '2-digit', 'hourCycle': 'h24'});
+    const dateTimeFormat = new Intl.DateTimeFormat('en', {'year': '2-digit', 'month': 'short', 'day': '2-digit', 'hour': '2-digit', 'minute': '2-digit', 'hourCycle': 'h24', 'timeZone': 'UTC'});
     const [{'value': month},,{'value': day},,{'value': year},,{'value': hour},,{'value': minute}] = dateTimeFormat.formatToParts(trefOfp);
     const name = `Route Gramet ${ofp.infos['flight']} ${ofp.infos['departure']}-${ofp.infos['destination']} ${day}${month}${year} ${hour}:${minute}z OFP ${ofp.infos['ofp']}`;
     let hini = 0;
@@ -156,6 +157,6 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     const labels = route.points.filter(p => p.name !== "").map(p => p.name);
     route.description = labels.join(' ');
     const url = `http://www.ogimet.com/display_gramet.php?lang=en&hini=${hini}&tref=${tref}&hfin=${hfin}&fl=${fl}&hl=3000&aero=yes&wmo=${labels.join('_')}&submit=submit`;
-    const proxy = `${hini}-${trefOfp}-${hfin}-${fl}-${labels.join('_')}`;
-    return {tref, trefOfp, name, route, 'wmo': labels, url, proxy};
+    const proxy = `${hini}-${Math.round(ts)}-${hfin}-${fl}-${labels.join('_')}`;
+    return {tref, name, route, 'wmo': labels, url, proxy};
 }

@@ -1,8 +1,10 @@
 /* eslint-env jest */
 /* eslint-disable sort-imports */
 import {Route} from "../src";
-import {loadDataAsString} from "./utils"
-import {Ofp} from "../src/modules/ofp"
+import {loadDataAsString} from "./utils";
+import {Ofp} from "../src/modules/ofp";
+import {ogimetData} from "../src/modules/ogimet";
+import {GeoGridIndex} from "../src/modules/geoindex";
 
 const ofpText = loadDataAsString("AF010_LFPG-KJFK_27Sep2019_1450z_OFP_6_nvp_pdfjs.txt");
 const ofp = new Ofp(ofpText);
@@ -87,4 +89,10 @@ test("tracks", () => {
 
 test("lidoRoute", () => {
   expect(ofp.lidoRoute().join(" ")).toEqual("LFPG N4900.9E00225.0 N4907.1E00219.2 ATREX UT225 VESAN UL613 SOVAT UL613 SANDY UN601 LESTA UP6 RODOL UM65 TENSO L603 REMSI DCT GOMUP 58N020W 58N030W 57N040W 55N050W LOMSI DCT DANOL DCT ENE J121 SEY N4106.0W07207.2 N4055.8W07247.9 N4041.1W07302.0 N4041.2W07320.6 N4045.6W07337.8 KJFK KBOS");
+});
+
+test("ogimet route name", () => {
+  const data = ogimetData(ofp, new GeoGridIndex());
+  expect(data.route.name).toEqual('Route Gramet AF010 LFPG-KJFK 27Sep19 15:14z OFP 6');
+  expect(data.proxy).toEqual('0-1569597240-8-350-');
 });
