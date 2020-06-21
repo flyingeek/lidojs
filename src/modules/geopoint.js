@@ -345,10 +345,10 @@ class GeoPoint {
             return new GeoPoint(new LatPhi(rlat, phi).asLatLng);
         }
         const points = [];
-        for (let i = 0; i < steps; i += 1) {
+        for (let i = 0; i <= steps; i += 1) {
             points.push(destination(radius, i * 2 * Math.PI / steps));
         }
-        points.push(points[0]); // close circle
+        //points.push(points[0]); // close circle
         return points;
     }
 
