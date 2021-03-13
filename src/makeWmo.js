@@ -10,6 +10,7 @@ const wmoPath = "./dist/wmo.json";
 const wmoVarPath = "./dist/wmo.var.js";
 const wmoURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/nsd_bbsss.txt";
 const volaURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/vola_legacy_report.txt";
+//const volaURL = "https://oscar.wmo.int/oscar/vola/vola_legacy_report.txt";
 
 /**
  * Promise to vola importer
@@ -128,7 +129,7 @@ async function mergeData() {
     for (const [wid, name, lon, lat] of wmoData) {
       if (wid in volaData){
         const [volaLon, volaLat, remarks] = volaData[wid];
-        if (['CYMT'].indexOf(name) >= 0) continue;
+        if (['CYMT', 'LFBV'].indexOf(name) >= 0) continue;
         if (remarks.indexOf("GOS") < 0) continue;
         if (Math.abs(volaLon - lon) > 0.1 || Math.abs(volaLat - lat) > 0.1) {
           continue;
