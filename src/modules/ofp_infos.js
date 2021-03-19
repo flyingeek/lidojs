@@ -46,17 +46,22 @@ function ofpInfos(text) {
     .extract("ATC FLIGHT PLAN", "TRACKSNAT")
     .extract("(", ")", false, true);
 
-  pattern = new RegExp(String.raw`-${destination}(\d{4})\s`, "u");
-  match = pattern.exec(rawFplText);
   let duration = [1, 0];
-  if (match === null) {
-    console.log("flight duration not found, arbitrary set to 1 hour");
-  } else {
-    duration = [
-      parseInt(match[1].substring(0,2), 10),
-      parseInt(match[1].substring(2,4), 10)
-    ];
+  pattern = new RegExp(String.raw`-TRIP\s+[0-9]+[\s.]+([0-9]{4})`, "u");
+  match = pattern.exec(text);
+  if (match === null){
+    pattern = new RegExp(String.raw`-${destination}(\d{4})\s`, "u");
+    match = pattern.exec(rawFplText);
+    duration = [1, 0];
+    if (match === null) {
+      console.log("flight duration not found, arbitrary set to 1 hour");
+    }
   }
+  duration = [
+    parseInt(match[1].substring(0,2), 10),
+    parseInt(match[1].substring(2,4), 10)
+  ];
+
 
   // try with 2 alternates first
   pattern = new RegExp(String.raw`-${destination}.+\s(\S{4})\s(\S{4})\s?[\n\-]`, "u");
@@ -159,7 +164,9 @@ function ofpInfos(text) {
     "departure": departure,
     "destination": destination,
     "datetime": new Date(Date.UTC(year, month, day, hours, minutes)),
-    "datetime2": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime)),
+    "takeoff": new Date(Date.UTC(year, month, day, hours , minutes + taxitime)),
+    "landing": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime)),
+    "datetime2": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime)), //backward compatibility
     "date": date,
     "ofp": ofp.replace("\xA9", ""),
     "duration": duration,
