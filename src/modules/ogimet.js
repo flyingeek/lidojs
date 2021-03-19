@@ -137,8 +137,8 @@ export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSiz
 export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     // timestamp for departure
     const taxitime = ofp.infos['taxitime'];
-    const ts = (ofp.infos['datetime'].valueOf() / 1000) + (taxitime * 60);
-    const now_ts = (new Date()).valueOf() / 1000;
+    const ts = (ofp.infos['datetime'].getTime() / 1000) + (taxitime * 60);
+    const now_ts = (new Date()).getTime() / 1000;
     const tref = Math.round(Math.max(ts, now_ts)); //for old ofp timeref=now
     const trefOfp = new Date(Math.round(ts) * 1000);
     // const dateref = new Date(tref * 1000); //for caching we use the ofp time instead
