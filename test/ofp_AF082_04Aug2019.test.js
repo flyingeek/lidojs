@@ -19,3 +19,7 @@ test("infos", () => {
     expect(infos.raltPoints.map(v => v.name)).toEqual(['BIKF','CYQX', 'CYEG']);
     expect(infos.ETOPS).toEqual(180);
   });
+  test('wptNamesEET', () => {
+    const results = ofp.wptNamesEET(ofp.wptCoordinates());
+    expect(results.length === 0).toBeFalsy();
+  });

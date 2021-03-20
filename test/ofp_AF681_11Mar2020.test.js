@@ -26,3 +26,8 @@ test("infos", () => {
     expect(infos.raltPoints.map(v => v.name)).toEqual(['LPLA','EINN']);
     expect(infos.ETOPS).toEqual(180);
   });
+
+test('wptNamesEET', () => {
+  const results = ofp.wptNamesEET(ofp.wptCoordinates());
+  expect(results.length === 0).toBeFalsy();
+});

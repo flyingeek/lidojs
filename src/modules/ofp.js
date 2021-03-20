@@ -53,6 +53,7 @@ export class Ofp {
       }
       return this.cacheStore[name];
     };
+    this.removePageFooterRegex = new RegExp(String.raw`Page\s[0-9].+?Page\s[0-9].+?\/${this.infos['departure']}-${this.infos['destination']}`, 'gsu');
   }
 
   get description() {
@@ -69,7 +70,8 @@ export class Ofp {
   wptCoordinates(start="WPT COORDINATES") {
     const infos = this.infos;
     const end = (this.ofpType === ofpTypes.NVP) ? '----' + infos['destination']: '----';
-    const extract = this.text.extract(start, end);
+    let extract = this.text.extract(start, end);
+    extract = extract.replace(this.removePageFooterRegex,'');
     return extract.matchAll(wptRegExp);
   }
 
@@ -90,6 +92,49 @@ export class Ofp {
     const t = this.text.extract(start, end, end_is_optional)
     const extract = reverse(t).split('----', 1)[0];
     return reverse(extract).matchAll(wptRegExp);
+  }
+
+  wptNamesEET(geoPoints) {
+    const start = '--ATC DEPARTURE CLEARANCE';
+    const pattern = /[\s-]([A-Z0-9/]+)\s+[0-9]{3}\s+(?:[0-9.\s]{4})\s+\.\.\.\.\/\.\.\.\.\s(?:.{3})\s[A-Z0-9/.+\s-]+?[0-9]{4}\/([0-9]{4})\s+[0-9]{3}\/[0-9]{3}/gu;
+    const extract = this.text.extract(start, 'DESTINATION ALTERNATE', true);
+    const clean = extract.replace(this.removePageFooterRegex,'');
+    //console.log(clean);
+    const matches = clean.matchAll(pattern);
+
+    const eet = {};
+    let previousEET = 0;
+    for (let [,name,t,] of matches) {
+      //console.log(name)
+      if (name.startsWith('/')) name = name.slice(1); // ofp AF082
+      eet[name.split('/')[0]] = previousEET;
+      previousEET = (parseFloat(t.slice(0,2)) * 60) + parseFloat(t.slice(2))
+    }
+    eet[this.infos['destination']] = previousEET;
+    //console.log(eet);
+    const results = [];
+    let error = false;
+    for (const p of geoPoints) {
+      if (eet[p.name] === undefined) {
+          let altname = p.name.replace(/00\.0/gu,'')
+          if (eet[altname] === undefined) {
+              altname = p.name.replace(/\.0/gu,'')
+              if (eet[altname] === undefined) {
+                console.log('missing point', p.name);
+                results.push([p, -1]);
+                error = true;
+                break;
+              } else {
+                results.push([p, eet[altname]]);
+              }
+          } else {
+            results.push([p, eet[altname]])
+          }
+      } else {
+          results.push([p, eet[p.name]])
+      }
+    }
+    return (error) ? [] : results;
   }
 
   /**

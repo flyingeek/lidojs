@@ -97,3 +97,7 @@ test("ogimet route name", () => {
   expect(data.route.name).toEqual('Route Gramet AF010 LFPG-KJFK 27Sep19 15:14z OFP 6');
   expect(data.proxy).toEqual('0-1569597240-8-350-');
 });
+test('wptNamesEET', () => {
+  const results = ofp.wptNamesEET(ofp.wptCoordinates());
+  expect(results.length === 0).toBeFalsy();
+});
