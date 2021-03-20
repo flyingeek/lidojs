@@ -72,7 +72,9 @@ export class Ofp {
     const end = (this.ofpType === ofpTypes.NVP) ? '----' + infos['destination']: '----';
     let extract = this.text.extract(start, end);
     extract = extract.replace(this.removePageFooterRegex,'');
-    return extract.matchAll(wptRegExp);
+    const geoPoints = extract.matchAll(wptRegExp);
+    if (geoPoints.length > 0) geoPoints[0].name = this.infos['departure']; // avoid name problems
+    return geoPoints;
   }
 
   /**
