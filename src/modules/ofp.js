@@ -53,7 +53,7 @@ export class Ofp {
       }
       return this.cacheStore[name];
     };
-    this.removePageFooterRegex = new RegExp(String.raw`([\s-]\d)?Page\s[0-9]+\s.+?Page\s[0-9]+.+?\/${this.infos['departure']}-${this.infos['destination']}`, 'gsu');
+    this.removePageFooterRegex = new RegExp(String.raw`([\s-]\d{1,2})?Page\s[0-9]+\s.+?Page\s[0-9]+.+?\/${this.infos['departure']}-${this.infos['destination']}`, 'gsu');
   }
 
   get description() {
