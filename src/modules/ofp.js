@@ -98,7 +98,7 @@ export class Ofp {
 
   wptNamesEET(geoPoints) {
     const start = 'ATC DEPARTURE';
-    const pattern = /[\s-]([A-Z0-9/]+)\s+[0-9]{3}\s+(?:[0-9.\s]{4})\s+\.\.\.\.\/\.\.\.\.\s(?:.{3})\s[A-Z0-9/.+\s-]+?[0-9]{4}\/([0-9]{4})\s+[0-9]{3}\/[0-9]{3}/gu;
+    const pattern = /[\s-]([A-Z0-9/]+)\s+[0-9]{3}\s+(?:[0-9.\s]{4})\s+\.\.\.\.\/\.\.\.\.\s(.{3})\s[A-Z0-9/.+\s-]+?[0-9]{4}\/([0-9]{4})\s+[0-9]{3}\/[0-9]{3}/gu;
     const extract = this.text.extract(start, 'DESTINATION ALTERNATE', true);
     const clean = extract.replace(this.removePageFooterRegex,'');
     //console.log(clean);
@@ -106,13 +106,17 @@ export class Ofp {
 
     const eet = {};
     let previousEET = 0;
-    for (let [,name,t,] of matches) {
+    // eslint-disable-next-line init-declarations
+    let previousFL = this.infos.levels[0];
+    for (let [,name, level, t,] of matches) {
       //console.log(name)
       if (name.startsWith('/')) name = name.slice(1); // ofp AF082
-      eet[name.split('/')[0]] = previousEET;
+      const fl = parseInt(level, 10);
+      if (!isNaN(fl)) previousFL = fl;
+      eet[name.split('/')[0]] = [previousEET, previousFL];
       previousEET = (parseFloat(t.slice(0,2)) * 60) + parseFloat(t.slice(2))
     }
-    eet[this.infos['destination']] = previousEET;
+    eet[this.infos['destination']] = [previousEET, previousFL];
     //console.log(eet);
     const results = [];
     let error = false;
@@ -123,17 +127,16 @@ export class Ofp {
               altname = p.name.replace(/\.0/gu,'')
               if (eet[altname] === undefined) {
                 console.log('missing point', p.name);
-                results.push([p, -1]);
                 error = true;
                 break;
               } else {
-                results.push([p, eet[altname]]);
+                results.push([p, ...eet[altname]]);
               }
           } else {
-            results.push([p, eet[altname]])
+            results.push([p, ...eet[altname]])
           }
       } else {
-          results.push([p, eet[p.name]])
+          results.push([p, ...eet[p.name]])
       }
     }
     return (error) ? [] : results;
