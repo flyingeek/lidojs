@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /* eslint-disable max-lines-per-function */
 
 import {GeoPoint} from './geopoint';
@@ -23,6 +24,8 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - EXP the ETOPS exit GeoPoint
  - raltPoints the ETOPS airports as GeoPoint
  - ETOPS the ETOPS time in minutes
+ - fl average flight level or 300
+ - levels = array of flight levels found in FPL or [300]
  * @param text The OFP in text format
  * @returns {{duration: number[], flight: string, datetime: Date, taxitime: number, destination: string, ofp: string, ralts: [], departure: string, alternates: [], rawfpl: string}}
  */
@@ -85,6 +88,13 @@ function ofpInfos(text) {
     ralts = match[1].trim().split(/\s/u);
   }
 
+  let levels = [...rawFplText.matchAll(/F(\d{3})\s/ug)].map(v => (v[1]*1));
+  let fl = 300;
+  if (levels && levels.length) {
+      fl = Math.round(levels.reduce((a, b) => a + b, 0) / levels.length);
+  } else {
+    levels = [fl];
+  }
   const rawFS = text.extract("FLIGHT SUMMARY", "Generated");
   pattern = /\s(\d{2})(\d{2})\s+TAXI IN/u;
   match = pattern.exec(rawFS);
@@ -178,7 +188,9 @@ function ofpInfos(text) {
     "aircraft": aircraft,
     "EEP": null,
     "EXP": null,
-    "ETOPS": etopsTime
+    "ETOPS": etopsTime,
+    fl,
+    levels
   }
   try {
     infos['raltPoints'] = ralts.map(v => new GeoPoint(AIRPORTS[v], {'name': v, 'description': 'ETOPS'}));
