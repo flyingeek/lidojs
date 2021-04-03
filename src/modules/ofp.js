@@ -22,13 +22,11 @@ const FISHPOINTS = require('./fishpoints');
 export class Ofp {
   constructor(text="") {
     console.assert(text.startsWith("_PDFJS_"), "invalid text file");
-    this.text = text;
     this.pdfParser = pdfParsers.pdfjs;
     this.ofpType = ofpTypes.S4;
     if (text.includes("--FLIGHT SUMMARY--")) {
       this.ofpType = ofpTypes.NVP;
     }
-
     try {
       this.infos = ofpInfos(text);
     } catch (error) {
@@ -43,7 +41,8 @@ export class Ofp {
       }
       throw error;
     }
-
+    this.removePageFooterRegex = new RegExp(String.raw`([\s-]\d{1,2})?Page\s[0-9]+\s.+?Page\s[0-9]+.+?\/${this.infos['departure']}-${this.infos['destination']}`, 'gsu');
+    this.text = text.replace(this.removePageFooterRegex,'');
     this.cache = function (name, fn) {
       if (this.cacheStore === undefined) {
         this.cacheStore = {}; /* on first run create cache storage */
@@ -53,7 +52,6 @@ export class Ofp {
       }
       return this.cacheStore[name];
     };
-    this.removePageFooterRegex = new RegExp(String.raw`([\s-]\d{1,2})?Page\s[0-9]+\s.+?Page\s[0-9]+.+?\/${this.infos['departure']}-${this.infos['destination']}`, 'gsu');
   }
 
   get description() {
@@ -70,8 +68,7 @@ export class Ofp {
   wptCoordinates(start="WPT COORDINATES") {
     const infos = this.infos;
     const end = (this.ofpType === ofpTypes.NVP) ? '----' + infos['destination']: '----';
-    let extract = this.text.extract(start, end);
-    extract = extract.replace(this.removePageFooterRegex,'');
+    const extract = this.text.extract(start, end);
     const geoPoints = extract.matchAll(wptRegExp);
     if (geoPoints.length > 0) geoPoints[0].name = this.infos['departure']; // avoid name problems
     return geoPoints;
@@ -100,9 +97,7 @@ export class Ofp {
     const start = 'ATC DEPARTURE';
     const pattern = /[\s-]([A-Z0-9/]+)\s+[0-9]{3}\s+(?:[0-9.\s]{4})\s+\.\.\.\.\/\.\.\.\.\s(.{3})\s[A-Z0-9/.+\s-]+?[0-9]{4}\/([0-9]{4})\s+[0-9]{3}\/[0-9]{3}/gu;
     const extract = this.text.extract(start, 'DESTINATION ALTERNATE', true);
-    const clean = extract.replace(this.removePageFooterRegex,'');
-    //console.log(clean);
-    const matches = clean.matchAll(pattern);
+    const matches = extract.matchAll(pattern);
 
     const eet = {};
     let previousEET = 0;
