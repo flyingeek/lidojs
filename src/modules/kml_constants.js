@@ -17,10 +17,10 @@ export const PINS = [
     '#placemark-red', '#placemark-green', '#placemark-purple'];
 
 export const GOOGLEICONS = [
-    'FFFFFF', '6699FF', 'FFFF00',
-    'CC9966', 'FF9922', 'DD5599',
-    'FF0000', '22DD44', 'BB11EE',
-].map(c => `http://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=|${c}`);
+    '', 'blu', 'ylw',
+    'red', 'orange', 'pink',
+    'red', 'grn', 'purple',
+].map(c => ((c) ? `https://maps.google.com/mapfiles/kml/paddle/${c}-blank.png` : ''));
 
 /**
  * Avenza is missing color 3 and 5: brown and pink displayed as red

@@ -132,6 +132,7 @@ export const styleTemplate = ({id, color, width=6}) => `
 `;
 
 export const avenzaStyleTemplate = ({id, color, width=3}) => styleTemplate({id, color, width});
+export const googleEarthStyleTemplate = ({id, color, width=2}) => ((id === 'rnat') ? styleTemplate({id, color, 'width': 1}) : styleTemplate({id, color, width}));
 
 /**
  * IconsStyle Style renderer
@@ -141,15 +142,14 @@ export const avenzaStyleTemplate = ({id, color, width=3}) => styleTemplate({id, 
  * @param {string} [y="0.0"] - hotspot zone y, set to "0.5" for Avenza
  * @returns {string}
  */
-export const iconTemplate = ({id, href, x="0.5", y="0.0"}) => `
+export const iconTemplate = ({id, href, x="0.5", y="0.0"}) => ((href) ? `
     <Style id="${id}">
-        <IconStyle>
-            <Icon>
-                <href><![CDATA[${href}]]></href>
-            </Icon>
-            <hotSpot x="${x}"  y="${y}" xunits="fraction" yunits="fraction"/>
-        </IconStyle>
-    </Style>
-`;
+      <IconStyle>
+          <Icon>
+              <href><![CDATA[${href}]]></href>
+          </Icon>
+          <hotSpot x="${x}"  y="${y}" xunits="fraction" yunits="fraction"/>
+      </IconStyle>
+    </Style>\n` : `<Style id="${id}"></Style>\n`);
 
 export const avenzaIconTemplate = ({id, href, x="0.5", y="0.5"}) => iconTemplate({id, href, x, y});
