@@ -23,8 +23,8 @@ export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSiz
         }
         return [null, null];
     };
-
     const findStrategic = (start, end, results) => {
+        const length = results.length;
         for (let k = end - 1; k > start; k -= 1) {
             const o_xtd = results[k].ogimet.xtd_to(
                 [results[k].fpl, results[k + 1].fpl]
@@ -33,7 +33,8 @@ export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSiz
                 [results[start].ogimet, results[end].ogimet]
             )
             if (Math.abs(f_xtd) > Math.abs(o_xtd)) {
-                return k;
+                const d = (k < length - 1) ? results[k].fpl.distanceTo(results[k+1].fpl) : -1;
+                if (Math.abs(f_xtd) < d || d < 0) return k;
             }
         }
         return null;
