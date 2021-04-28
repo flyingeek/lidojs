@@ -292,12 +292,14 @@ export class Ofp {
     return this.cache("route", () => new Route(this.wptCoordinates()));
   }
 
-  lidoRoute() {
-    return this.cache("lidoRoute", () => {
+  lidoRoute(replaceSID=true) {
+    return this.cache("lidoRoute" + ((replaceSID) ? "_r" : ""), () => {
       const points = [];
-      const rawPoints = [];
+      const pointsName = []; // used if replaceSID === false
+      const rawPoints = []; // used if replaceSID === true
       this.route.points.forEach((p) => {
         rawPoints.push(p.dm);
+        pointsName.push(p.name || p.dm);
         if (p.name === "" || (/\d+/u).exec(p.name) !== null) {
           points.push(p.dm);
         } else {
@@ -316,16 +318,20 @@ export class Ofp {
       let innerFplRoute = fplRoute.slice(1, -1);
       let innerFplRouteLength = innerFplRoute.length;
 
+
       // replace points by rawPoint before first common waypoint
       for (let i = 0; i < innerFplRouteLength; i += 1 ) {
         let p = innerFplRoute[i];
         let offset = points.indexOf(p);
         if (offset !== -1) {
-          lidoPoints = rawPoints.slice(1, offset).concat(innerFplRoute.slice(i));
+          if (replaceSID) {
+            lidoPoints = rawPoints.slice(1, offset).concat(innerFplRoute.slice(i));
+          } else {
+            lidoPoints = pointsName.slice(1, offset).concat(innerFplRoute.slice(i));
+          }
           break;
         }
       }
-
       // replace points after last common waypoint by rawPoints
       let reversedPoints = points.slice().reverse(); // copy before reverse
       let reversedLidoRoute = lidoPoints.slice().reverse();
@@ -337,7 +343,11 @@ export class Ofp {
           if (i > 0) {
             lidoPoints = lidoPoints.slice(0, -i);
           }
-          lidoPoints = lidoPoints.concat(rawPoints.slice(-offset, -1));
+          if (replaceSID) {
+            lidoPoints = lidoPoints.concat(rawPoints.slice(-offset, -1));
+          } else {
+            lidoPoints = lidoPoints.concat(pointsName.slice(-offset, -1));
+          }
           break;
         }
       }
