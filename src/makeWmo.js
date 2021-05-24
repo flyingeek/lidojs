@@ -140,7 +140,7 @@ async function mergeData() {
       }
     }
     for (const [wid, [lon, lat, remarks]] of Object.entries(volaData)) {
-      if ((wmo.indexOf(wid) < 0) && (['71822'].indexOf(wid) < 0) && (remarks.indexOf("GOS") >= 0)) {
+      if ((wmo.indexOf(wid) < 0) && (['71822', '41298', '72232'].indexOf(wid) < 0) && (remarks.indexOf("GOS") >= 0)) {
         addData(wid, lat, lon);
         counter += 1;
       } else {
