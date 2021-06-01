@@ -27,3 +27,5 @@ jobs:
           artifacts: './dist/wmo.json, ./dist/wmo.var.js, ./dist/lidojs.js, ./dist/lidojs.min.js, ./dist/lidojs.var.min.js'
           token: ${{ secrets.GITHUB_TOKEN }}
       - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
