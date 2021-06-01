@@ -137,6 +137,20 @@ function ofpInfos(text) {
   if (match) {
       aircraft = aircraftTypes[match[1]] || '???';
   }
+  // aircraft registration
+  let registration = '';
+  pattern = /REG\/(\S+)/u
+  match = pattern.exec(rawFplText);
+  if (match) {
+      registration = match[1][0] + '-' + match[1].slice(1);
+  }
+  // icao24
+  let icao24 = '';
+  pattern = /CODE\/(\S+)/u
+  match = pattern.exec(rawFplText);
+  if (match) {
+    icao24 = match[1];
+  }
   // eslint-disable-next-line init-declarations
   let exp;
   // eslint-disable-next-line init-declarations
@@ -185,7 +199,9 @@ function ofpInfos(text) {
     "raltPoints": [],
     "taxitime": taxitime,
     "rawfpl": rawFplText,
-    "aircraft": aircraft,
+    aircraft,
+    registration,
+    icao24,
     "EEP": null,
     "EXP": null,
     "ETOPS": etopsTime,
