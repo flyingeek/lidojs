@@ -16,10 +16,14 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 13
+          registry-url: https://npm.pkg.github.com/
+          scope: '@flyingeek'
       - run: npm ci
       - run: npm run makewmo
+      - run: npm run build
       - run: npm test
       - uses: ncipollo/release-action@v1
         with:
-          artefacts: './dist/wmo.json, ./dist/wmo.var.js'
+          artifacts: './dist/wmo.json, ./dist/wmo.var.js, ./dist/lidojs.js, ./dist/lidojs.min.js, ./dist/lidojs.var.min.js'
           token: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm publish
