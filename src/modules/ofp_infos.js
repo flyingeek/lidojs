@@ -209,9 +209,24 @@ function ofpInfos(text) {
     levels
   }
   try {
-    infos['raltPoints'] = ralts.map(v => new GeoPoint(AIRPORTS[v], {'name': v, 'description': 'ETOPS'}));
-    if (eep) infos['EEP'] = new GeoPoint(AIRPORTS[eep], {'name': eep, 'description': 'EEP'});
-    if (exp) infos['EXP'] = new GeoPoint(AIRPORTS[exp], {'name': exp, 'description': 'EXP'});
+    infos['raltPoints'] = [];
+    for (const v of ralts) {
+      if (v && AIRPORTS[v]) {
+        infos['raltPoints'].push(new GeoPoint(AIRPORTS[v], {'name': v, 'description': 'ETOPS'}));
+      } else {
+        console.error('missing airport', v);
+      }
+    }
+    if (eep && AIRPORTS[eep]) {
+      infos['EEP'] = new GeoPoint(AIRPORTS[eep], {'name': eep, 'description': 'EEP'});
+    } else if (eep){
+      console.error('missing airport', eep);
+    }
+    if (exp && AIRPORTS[exp]) {
+      infos['EXP'] = new GeoPoint(AIRPORTS[exp], {'name': exp, 'description': 'EXP'});
+    } else if (exp){
+      console.error('missing airport', exp);
+    }
   } catch (err) {
     console.log(err);
   }
