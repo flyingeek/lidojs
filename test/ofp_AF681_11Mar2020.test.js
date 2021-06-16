@@ -27,9 +27,9 @@ test("infos", () => {
     expect(infos.EXP.name).toEqual("EINN");
     expect(infos.raltPoints.map(v => v.name)).toEqual(['LPLA','EINN']);
     expect(infos.ETOPS).toEqual(180);
-    expect(infos.payload).toEqual(29500);
-    expect(infos.tripFuel).toEqual(51013);
-    expect(infos.blockFuel).toEqual(58869);
+    expect(infos.payload).toEqual(29.500);
+    expect(infos.tripFuel).toEqual(51.013);
+    expect(infos.blockFuel).toEqual(58.869);
   });
 
 test('wptNamesEET', () => {

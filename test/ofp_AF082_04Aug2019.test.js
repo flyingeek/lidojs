@@ -22,9 +22,9 @@ test("infos", () => {
     expect(infos.EXP.name).toEqual("CYEG");
     expect(infos.raltPoints.map(v => v.name)).toEqual(['BIKF','CYQX', 'CYEG']);
     expect(infos.ETOPS).toEqual(180);
-    expect(infos.payload).toEqual(31168);
-    expect(infos.tripFuel).toEqual(79501);
-    expect(infos.blockFuel).toEqual(86946);
+    expect(infos.payload).toEqual(31.168);
+    expect(infos.tripFuel).toEqual(79.501);
+    expect(infos.blockFuel).toEqual(86.946);
   });
   test('wptNamesEET', () => {
     const results = ofp.wptNamesEET(ofp.wptCoordinates());
