@@ -231,9 +231,9 @@ function ofpInfos(text) {
     levels,
     dep3,
     des3,
-    "payload": pld,
-    tripFuel,
-    blockFuel
+    "payload": pld / 1000,
+    "tripFuel": tripFuel / 1000,
+    "blockFuel": blockFuel / 1000
   }
   try {
     infos['raltPoints'] = [];
