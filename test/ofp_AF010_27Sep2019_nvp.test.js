@@ -20,7 +20,9 @@ test("infos", () => {
   );
   expect(infos.flight).toEqual("AF010");
   expect(infos.departure).toEqual("LFPG");
+  expect(infos.dep3).toEqual("CDG");
   expect(infos.destination).toEqual("KJFK");
+  expect(infos.des3).toEqual("JFK");
   expect(infos.ofp).toEqual("6");
   expect(infos.datetime.toISOString()).toEqual("2019-09-27T14:50:00.000Z");
   expect(infos.takeoff.toISOString()).toEqual("2019-09-27T15:14:00.000Z");

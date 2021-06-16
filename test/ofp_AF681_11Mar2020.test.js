@@ -10,7 +10,9 @@ test("infos", () => {
     const infos = ofp.infos;
     expect(infos.flight).toEqual("AF681");
     expect(infos.departure).toEqual("KATL");
+    expect(infos.dep3).toEqual("ATL");
     expect(infos.destination).toEqual("LFPG");
+    expect(infos.des3).toEqual("CDG");
     expect(infos.ofp).toEqual("6/0/1");
     expect(infos.datetime.toISOString()).toEqual("2020-03-11T22:35:00.000Z");
     expect(infos.takeoff.toISOString()).toEqual("2020-03-11T22:51:00.000Z");
@@ -25,6 +27,9 @@ test("infos", () => {
     expect(infos.EXP.name).toEqual("EINN");
     expect(infos.raltPoints.map(v => v.name)).toEqual(['LPLA','EINN']);
     expect(infos.ETOPS).toEqual(180);
+    expect(infos.payload).toEqual(29500);
+    expect(infos.tripFuel).toEqual(51013);
+    expect(infos.blockFuel).toEqual(58869);
   });
 
 test('wptNamesEET', () => {

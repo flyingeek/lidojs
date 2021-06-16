@@ -10,7 +10,9 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  Dictionary of common OFP data:
  - flight (AF009)
  - departure (KJFK)
+ - dep3 IATA departure (JFK)
  - destination (LFPG)
+ - des3 IATA destination (CDG)
  - datetime (a javascript Date object for scheduled departure block time)
  - date (OFP text date 25Apr2016)
  - datetime2 (a javascript Date object for scheduled arrival landing time)
@@ -26,8 +28,11 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - ETOPS the ETOPS time in minutes
  - fl average flight level or 300
  - levels = array of flight levels found in FPL or [300]
+ - payload
+ - tripFuel
+ - blockFuel
  * @param text The OFP in text format
- * @returns {{duration: number[], flight: string, datetime: Date, taxitime: number, destination: string, ofp: string, ralts: [], departure: string, alternates: [], rawfpl: string}}
+ * @returns {{duration: number[], flight: string, datetime: Date, taxitime: number, destination: string, ofp: string, ralts: [], departure: string, alternates: [], rawfpl: string, dep3: string, des3: string, tripFuel: number, blockFuel: number, payload: number}}
  */
 function ofpInfos(text) {
   let pattern = /(?<flight>AF\s+\S+\s+)(?<departure>\S{4})\/(?<destination>\S{4})\s+(?<datetime>\S+\/\S{4})z.*OFP\s+(?<ofp>\d+\S{0,8})/u;
@@ -50,7 +55,7 @@ function ofpInfos(text) {
     .extract("(", ")", false, true);
 
   let duration = [1, 0];
-  pattern = new RegExp(String.raw`-TRIP\s+[0-9]+[\s.]+([0-9]{4})`, "u");
+  pattern = new RegExp(String.raw`(?:-TRIP|SUMMARYTRIP)\s+[0-9]+[\s.]+([0-9]{4})\s`, "u");
   match = pattern.exec(text);
   if (match === null){
     pattern = new RegExp(String.raw`-${destination}(\d{4})\s`, "u");
@@ -58,6 +63,8 @@ function ofpInfos(text) {
     duration = [1, 0];
     if (match === null) {
       console.log("flight duration not found, arbitrary set to 1 hour");
+    } else {
+      console.log("trip time not found, using fpl flight time");
     }
   }
   duration = [
@@ -104,6 +111,21 @@ function ofpInfos(text) {
   } else {
     taxitime = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
   }
+  pattern = new RegExp(String.raw`\s${destination}/([A-Z]{3})\s\d{4}`, "u");
+  match = pattern.exec(rawFS);
+  const des3 = (match) ? match[1] : '';
+  pattern = new RegExp(String.raw`\s${departure}/([A-Z]{3})\s\d{4}`, "u");
+  match = pattern.exec(rawFS);
+  const dep3 = (match) ? match[1] : '';
+  pattern = /\.PLD\s+(\d+)\s/u;
+  match = pattern.exec(rawFS);
+  const pld = (match) ? parseInt(match[1], 10) : 0;
+  pattern = /\.BLOCK\s+(\d+)\s/u;
+  match = pattern.exec(rawFS);
+  const blockFuel = (match) ? parseInt(match[1], 10) : 0;
+  pattern = /\|TRIP\s+(\d+)\s/u;
+  match = pattern.exec(rawFS);
+  const tripFuel = (match) ? parseInt(match[1], 10) : 0;
 
   //aircraft type
   let aircraft = "???";
@@ -206,7 +228,12 @@ function ofpInfos(text) {
     "EXP": null,
     "ETOPS": etopsTime,
     fl,
-    levels
+    levels,
+    dep3,
+    des3,
+    "payload": pld,
+    tripFuel,
+    blockFuel
   }
   try {
     infos['raltPoints'] = [];
