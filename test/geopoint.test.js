@@ -7,7 +7,7 @@ import {
   dm_normalizer,
   km_to_nm, km_to_rad, nm_to_rad, rad_to_km, rad_to_nm
 } from "../src/modules/geopoint";
-import {LatLng, LatPhi, latphi2latlng} from "../src/modules/geolite";
+import {LatLng, PhiLam, philam2latlng} from "../src/modules/geolite";
 
 
 test("rad_to_nm", () => {
@@ -77,9 +77,9 @@ test("arinc_normalizer", () => {
 });
 
 
-test('latphi property', () => {
-  expect(new GeoPoint(new LatLng(45, -100)).latphi)
-      .toEqual(new LatPhi(0.7853981633974483, -1.7453292519943295));
+test('philam property', () => {
+  expect(new GeoPoint(new LatLng(45, -100)).philam)
+      .toEqual(new PhiLam(0.7853981633974483, -1.7453292519943295));
 });
 
 test("distance", () => {
@@ -142,16 +142,16 @@ test("creation using a GeoPoint", () => {
   expect(geopoint2.description).toBe("D2");
 });
 
-test.skip("creation from LatPhi Array", () => {
+test.skip("creation from PhiLam Array", () => {
   //TODO this is used in editolido library but here ?
-  let geopoint = new GeoPoint([0.7853981633974483, -1.7453292519943295], {"normalizer": latphi2latlng});
+  let geopoint = new GeoPoint([0.7853981633974483, -1.7453292519943295], {"normalizer": philam2latlng});
   expect(geopoint.latitude).toBeCloseTo(45);
   expect(geopoint.longitude).toBeCloseTo(-100);
 });
 
-test("creation from LatPhi", () => {
+test("creation from PhiLam", () => {
   let geopoint = new GeoPoint(
-      new LatPhi(0.7853981633974483, -1.7453292519943295), {"normalizer": latphi2latlng});
+      new PhiLam(0.7853981633974483, -1.7453292519943295), {"normalizer": philam2latlng});
   expect(geopoint.latitude).toBeCloseTo(45);
   expect(geopoint.longitude).toBeCloseTo(-100);
 });

@@ -1,4 +1,5 @@
-import {LatLng, LatPhi} from "./geolite";
+/* eslint-disable max-lines */
+import {LatLng, PhiLam} from "./geolite";
 
 
 // earth mean radius in meters
@@ -14,6 +15,7 @@ const km_to_rad = (km) => km * 1000.0 / R;
 const km_to_nm = (km) => km * 1000.0 / NM;
 
 const fmod = (a, b) => Number((a - (Math.floor(a / b) * b)).toPrecision(8));
+
 /**
  * convert geo coordinates in degrees, minutes in signed fixed value
  *  N5500.0 => 55.00000000
@@ -140,7 +142,7 @@ class GeoPoint {
         }
         this.name = name.trim();
         this.description = description;
-        this.latphi_cache = null;
+        this.philam_cache = null;
         this.dm_cache = null;
     }
 
@@ -157,14 +159,14 @@ class GeoPoint {
     }
 
     /**
-     * Lazy conversion LatPhi
-     * @returns {LatPhi}
+     * Lazy conversion PhiLam
+     * @returns {PhiLam}
      */
-    get latphi() {
-        if (this.latphi_cache === null) {
-            this.latphi_cache = this.latlng.asLatPhi;
+    get philam() {
+        if (this.philam_cache === null) {
+            this.philam_cache = this.latlng.asPhiLam;
         }
-        return this.latphi_cache;
+        return this.philam_cache;
     }
 
     /**
@@ -221,26 +223,26 @@ class GeoPoint {
      */
     static getCenter(geopoints, options={}) {
         let howMany = geopoints.length,
+            lam = 0,
             phi = 0,
-            rlat = 0,
             x = 0,
             y = 0,
             z = 0;
 
         for (let p of geopoints) {
-            rlat = p.latphi.rlat;
-            phi = p.latphi.phi;
-            let cosrlat = Math.cos(rlat);
-            x += cosrlat * Math.cos(phi);
-            y += cosrlat * Math.sin(phi);
-            z += Math.sin(rlat);
+            phi = p.philam.phi;
+            lam = p.philam.lam;
+            let cosphi = Math.cos(phi);
+            x += cosphi * Math.cos(lam);
+            y += cosphi * Math.sin(lam);
+            z += Math.sin(phi);
         }
         x /= howMany;
         y /= howMany;
         z /= howMany;
-        rlat = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)));
-        phi = Math.atan2(y, x);
-        return new GeoPoint(new LatPhi(rlat, phi).asLatLng, options || {});
+        phi = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)));
+        lam = Math.atan2(y, x);
+        return new GeoPoint(new PhiLam(phi, lam).asLatLng, options || {});
     }
 
     /**
@@ -250,13 +252,13 @@ class GeoPoint {
      * @returns {number} the distance in the unit set by the converter
      */
     distanceTo(other, converter=null) {
-        const rlat1 = this.latphi.rlat;
-        const phi1 = this.latphi.phi;
-        const rlat2 = other.latphi.rlat;
-        const phi2 = other.latphi.phi;
+        const phi1 = this.philam.phi;
+        const lam1 = this.philam.lam;
+        const phi2 = other.philam.phi;
+        const lam2 = other.philam.lam;
         const sd = Math.acos(
-            Math.sin(rlat1) * Math.sin(rlat2)
-            + Math.cos(rlat1) * Math.cos(rlat2) * Math.cos(phi2 - phi1)
+            Math.sin(phi1) * Math.sin(phi2)
+            + Math.cos(phi1) * Math.cos(phi2) * Math.cos(lam2 - lam1)
         );
         if (converter !== null) {
             return converter(sd);
@@ -270,14 +272,14 @@ class GeoPoint {
      * @returns {number} the course in radian
      */
     course_to(other) {
-        const rlat1 = this.latphi.rlat;
-        const phi1 = this.latphi.phi;
-        const rlat2 = other.latphi.rlat;
-        const phi2 = other.latphi.phi;
+        const phi1 = this.philam.phi;
+        const lam1 = this.philam.lam;
+        const phi2 = other.philam.phi;
+        const lam2 = other.philam.lam;
         return fmod(
             Math.atan2(
-                Math.sin(phi1 - phi2) * Math.cos(rlat2),
-                Math.cos(rlat1) * Math.sin(rlat2) - Math.sin(rlat1) * Math.cos(rlat2) * Math.cos(phi1 - phi2)
+                Math.sin(lam1 - lam2) * Math.cos(phi2),
+                Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(lam1 - lam2)
             ),
             2 * Math.PI
         );
@@ -285,7 +287,7 @@ class GeoPoint {
 
     /**
      * Given the segment AB; computes cross track error
-     * @param {[GeoPoint, GeoPoint]} segment the segment AB 
+     * @param {[GeoPoint, GeoPoint]} segment the segment AB
      * @param {?function} converter the converter to use otherwise result in radians
      * @returns {number} the distance in radian unless a converter is set
      */
@@ -310,18 +312,18 @@ class GeoPoint {
      */
     atFraction(other, fraction=0.5, distance=null) {
         const d = (distance === null) ? this.distanceTo(other) : distance;
-        const rlat1 = this.latphi.rlat;
-        const phi1 = this.latphi.phi;
-        const rlat2 = other.latphi.rlat;
-        const phi2 = other.latphi.phi;
+        const phi1 = this.philam.phi;
+        const lam1 = this.philam.lam;
+        const phi2 = other.philam.phi;
+        const lam2 = other.philam.lam;
         const a = Math.sin((1 - fraction) * d) / Math.sin(d);
         const b = Math.sin(fraction * d) / Math.sin(d);
-        const x = a * Math.cos(rlat1) * Math.cos(phi1) + b * Math.cos(rlat2) * Math.cos(phi2);
-        const y = a * Math.cos(rlat1) * Math.sin(phi1) + b * Math.cos(rlat2) * Math.sin(phi2);
-        const z = a * Math.sin(rlat1) + b * Math.sin(rlat2);
-        const rlat = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)));
-        const phi = Math.atan2(y, x);
-        return new GeoPoint(new LatPhi(rlat, phi).asLatLng);
+        const x = a * Math.cos(phi1) * Math.cos(lam1) + b * Math.cos(phi2) * Math.cos(lam2);
+        const y = a * Math.cos(phi1) * Math.sin(lam1) + b * Math.cos(phi2) * Math.sin(lam2);
+        const z = a * Math.sin(phi1) + b * Math.sin(phi2);
+        const phi = Math.atan2(z, Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)));
+        const lam = Math.atan2(y, x);
+        return new GeoPoint(new PhiLam(phi, lam).asLatLng);
     }
 
     /**
@@ -333,16 +335,16 @@ class GeoPoint {
     circle(radius, steps=64, converter=nm_to_rad) {
         if (converter) radius = converter(radius);
         const destination = (d, tc) => {
-            const lat1 = this.latphi.rlat;
-            const lon1 = this.latphi.phi;
-            const rlat = Math.asin(Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) *Math.sin(d) * Math.cos(tc));
-            let phi = lon1;
-            if (Math.cos(rlat) !== 0) {
-                phi = Math.asin(Math.sin(tc) * Math.sin(d) / Math.cos(rlat))
-                if (lon1 - phi < - Math.PI) phi = lon1 + Math.PI; // fix PPT ETOPS circle
-                phi = fmod(lon1 - phi + Math.PI, 2 * Math.PI) - Math.PI;
+            const lat1 = this.philam.phi;
+            const lon1 = this.philam.lam;
+            const phi = Math.asin(Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) *Math.sin(d) * Math.cos(tc));
+            let lam = lon1;
+            if (Math.cos(phi) !== 0) {
+                lam = Math.asin(Math.sin(tc) * Math.sin(d) / Math.cos(phi))
+                if (lon1 - lam < - Math.PI) lam = lon1 + Math.PI; // fix PPT ETOPS circle
+                lam = fmod(lon1 - lam + Math.PI, 2 * Math.PI) - Math.PI;
             }
-            return new GeoPoint(new LatPhi(rlat, phi).asLatLng);
+            return new GeoPoint(new PhiLam(phi, lam).asLatLng);
         }
         const points = [];
         for (let i = 0; i <= steps; i += 1) {

@@ -2,11 +2,11 @@
 latitude is the latitude in degrees
 longitude is the longitude in degrees
 
-rlat is the latitude in radians (lambda is a reserved name in python)
-phi is the longitude in radians
+lam is the longitude in radians (lambda is a reserved name in python)
+phi is the latitude in radians
 
 LatLng is the base object when using degrees
-LatPhi is the base object when using lradians
+PhiLam is the base object when using lradians
 */
 
 /**
@@ -14,7 +14,7 @@ LatPhi is the base object when using lradians
  *
  * @property {number} latitude - latitude in degrees
  * @property {number} longitude - longitude in degrees
- * @property {LatPhi} asLatPhi - convert to a LatPhi
+ * @property {PhiLam} PhiLam - convert to a PhiLam
  */
 class LatLng {
     constructor(latitude, longitude) {
@@ -65,28 +65,28 @@ class LatLng {
         return format(this.latitude) + format(this.longitude, 'EW');
     }
 
-    get asLatPhi() {
-        const [rlat, phi] = [this.latitude, this.longitude].map((d) => d * Math.PI / 180);
-        return new LatPhi(rlat, phi);
+    get asPhiLam() {
+        const [phi, lam] = [this.latitude, this.longitude].map((d) => d * Math.PI / 180);
+        return new PhiLam(phi, lam);
     }
 }
 
 /**
- * LatPhi
+ * PhiLam
  *
- * @property {number} rlat - latitude in radians
- * @property {number} phi - longitude in radians
+ * @property {number} phi - latitude in radians
+ * @property {number} lam - longitude in radians
  * @property {LatLng} asLatLng - convert to a LatLng
  */
-class LatPhi {
-    constructor(rlat, phi) {
-        this.rlat = rlat;
+class PhiLam {
+    constructor(phi, lam) {
         this.phi = phi;
+        this.lam = lam;
     }
 
     // eslint-disable-next-line class-methods-use-this
     get [Symbol.toStringTag]() {
-        return 'LatPhi';
+        return 'PhiLam';
     }
 
     /**
@@ -94,15 +94,15 @@ class LatPhi {
      * @returns {LatLng}
      */
     get asLatLng() {
-        const [latitude, longitude] = [this.rlat, this.phi].map((r) => r * 180 / Math.PI);
+        const [latitude, longitude] = [this.phi, this.lam].map((r) => r * 180 / Math.PI);
         return new LatLng(latitude, longitude);
     }
 }
 
 //helper for python like code
-const latphi2latlng = (latphi) => latphi.asLatLng;
+const philam2latlng = (philam) => philam.asLatLng;
 const latlng2dm = (latlng) => latlng.asDM;
 
 export {
-    LatLng, LatPhi, latphi2latlng, latlng2dm
+    LatLng, PhiLam, philam2latlng, latlng2dm
 };

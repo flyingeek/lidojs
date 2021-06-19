@@ -1,16 +1,16 @@
 /* eslint-env jest */
-import {LatLng, LatPhi, latlng2dm, latphi2latlng} from '../src/modules/geolite';
+import {LatLng, PhiLam, latlng2dm, philam2latlng} from '../src/modules/geolite';
 
-test('latphi2latlng', () => {
-    const latphi = new LatPhi(0.3, -1.0);
-    const latlng = latphi.asLatLng;
+test('philam2latlng', () => {
+    const philam = new PhiLam(0.3, -1.0);
+    const latlng = philam.asLatLng;
     expect(latlng).toBeInstanceOf(LatLng);
-    expect(latphi.rlat).toBeCloseTo(latlng.latitude * Math.PI / 180);
-    expect(latphi.phi).toBeCloseTo(latlng.longitude * Math.PI / 180);
-    const latlng2 = latphi2latlng(latphi);
+    expect(philam.phi).toBeCloseTo(latlng.latitude * Math.PI / 180);
+    expect(philam.lam).toBeCloseTo(latlng.longitude * Math.PI / 180);
+    const latlng2 = philam2latlng(philam);
     expect(latlng2).toBeInstanceOf(LatLng);
-    expect(latphi.rlat).toBeCloseTo(latlng2.latitude * Math.PI / 180);
-    expect(latphi.phi).toBeCloseTo(latlng2.longitude * Math.PI / 180);
+    expect(philam.phi).toBeCloseTo(latlng2.latitude * Math.PI / 180);
+    expect(philam.lam).toBeCloseTo(latlng2.longitude * Math.PI / 180);
 });
 
 test('LatLng DM conversion test', () => {
@@ -25,17 +25,17 @@ test('LatLng DM conversion test', () => {
     expect(latlng.asDM).toBe(latlng2dm(latlng));
 });
 
-test("LatLng to LatPhi conversion", () => {
-    const latphi = new LatLng(45, 90).asLatPhi;
-    expect(latphi).toBeInstanceOf(LatPhi);
-    expect(latphi.rlat).toBeCloseTo(Math.PI / 4);
-    expect(latphi.phi).toBeCloseTo(Math.PI / 2);
+test("LatLng to PhiLam conversion", () => {
+    const philam = new LatLng(45, 90).asPhiLam;
+    expect(philam).toBeInstanceOf(PhiLam);
+    expect(philam.phi).toBeCloseTo(Math.PI / 4);
+    expect(philam.lam).toBeCloseTo(Math.PI / 2);
 });
 
 test("LatLng object StringTag", () => {
     expect(new LatLng().toString()).toBe('[object LatLng]');
 });
 
-test("LatPhi object StringTag", () => {
-    expect(new LatPhi().toString()).toBe('[object LatPhi]');
+test("PhiLam object StringTag", () => {
+    expect(new PhiLam().toString()).toBe('[object PhiLam]');
 });
