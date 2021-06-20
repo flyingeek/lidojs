@@ -6,10 +6,11 @@ import {LatLng, PhiLam} from "./geolite";
 // nm in meters
 const R = 6371000.0;
 const NM = 1852.0;
-
+const deg = 180 / Math.PI;
 // Converters
 const rad_to_nm = (radians) => radians * R / NM;
 const rad_to_km = (radians) => radians * R / 1000.0;
+const rad_to_deg = (radians) => radians * deg;
 const nm_to_rad = (nm) => nm * NM / R;
 const km_to_rad = (km) => km * 1000.0 / R;
 const km_to_nm = (km) => km * 1000.0 / NM;
@@ -371,4 +372,4 @@ class GeoPoint {
     }
 }
 
-export {array_normalizer, dm_normalizer, arinc_normalizer, GeoPoint,dm2decimal,km_to_nm, km_to_rad, nm_to_rad, rad_to_km, rad_to_nm, NM, R};
+export {array_normalizer, dm_normalizer, arinc_normalizer, GeoPoint,dm2decimal,km_to_nm, km_to_rad, nm_to_rad, rad_to_km, rad_to_nm, rad_to_deg, NM, R};
