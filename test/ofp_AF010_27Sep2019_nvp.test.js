@@ -24,12 +24,14 @@ test("infos", () => {
   expect(infos.destination).toEqual("KJFK");
   expect(infos.des3).toEqual("JFK");
   expect(infos.ofp).toEqual("6");
+  expect(infos.taxitime).toEqual(24);
+  expect(infos.taxitime2).toEqual(51);
   expect(infos.datetime.toISOString()).toEqual("2019-09-27T14:50:00.000Z");
   expect(infos.takeoff.toISOString()).toEqual("2019-09-27T15:14:00.000Z");
   expect(infos.landing.toISOString()).toEqual("2019-09-27T22:29:00.000Z");
+  expect(infos.datetime2.toISOString()).toEqual("2019-09-27T23:20:00.000Z");
   expect(infos.date).toEqual("27Sep2019");
   expect(infos.duration).toEqual([7, 15]);
-  expect(infos.taxitime).toEqual(24);
   expect(infos.ralts).toEqual([]);
   expect(infos.alternates).toEqual(["KBOS"]);
   expect(infos.aircraft).toEqual("380");

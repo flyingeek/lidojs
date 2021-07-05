@@ -15,12 +15,13 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - des3 IATA destination (CDG)
  - datetime (a javascript Date object for scheduled departure block time)
  - date (OFP text date 25Apr2016)
- - datetime2 (a javascript Date object for scheduled arrival landing time)
+ - datetime2 (a javascript Date object for scheduled arrival block time)
  - duration [hours, minutes] hours and minutes are Number
  - ofp (OFP number 9/0/1)
  - alternates an array of alternate
  - ralts an array of route alternates (ETOPS)
  - taxitime (departure taxi time in mn)
+ - taxitime2 (arrival taxi time in mn)
  - rawfpl the raw text of the FPL
  - EEP the  ETOPS entry GeoPoint
  - EXP the ETOPS exit GeoPoint
@@ -110,6 +111,14 @@ function ofpInfos(text) {
     console.log("taxitime not found, arbitrary set to 15mn");
   } else {
     taxitime = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+  }
+  let taxitime2= 15;
+  pattern = /\/\s+(\d{2})(\d{2})MIN/u;
+  match = pattern.exec(rawFS);
+  if (match === null) {
+    console.log("arrival taxitime not found, arbitrary set to 15mn");
+  } else {
+    taxitime2 = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
   }
   pattern = new RegExp(String.raw`\s${destination}/([A-Z]{3})\s\d{4}`, "u");
   match = pattern.exec(rawFS);
@@ -212,7 +221,7 @@ function ofpInfos(text) {
     "datetime": new Date(Date.UTC(year, month, day, hours, minutes)),
     "takeoff": new Date(Date.UTC(year, month, day, hours , minutes + taxitime)),
     "landing": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime)),
-    "datetime2": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime)), //backward compatibility
+    "datetime2": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime + taxitime2)),
     "date": date,
     "ofp": ofp.replace("\xA9", ""),
     "duration": duration,
@@ -220,6 +229,7 @@ function ofpInfos(text) {
     "ralts": ralts,
     "raltPoints": [],
     "taxitime": taxitime,
+    "taxitime2": taxitime2,
     "rawfpl": rawFplText,
     aircraft,
     registration,
