@@ -15,7 +15,8 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - des3 IATA destination (CDG)
  - datetime (a javascript Date object for scheduled departure block time)
  - date (OFP text date 25Apr2016)
- - datetime2 (a javascript Date object for scheduled arrival block time)
+ - datetime2 (a javascript Date object for estimated arrival block time)
+ - station (a javascript Date object for scheduled arrival block time)
  - duration [hours, minutes] hours and minutes are Number
  - ofp (OFP number 9/0/1)
  - alternates an array of alternate
@@ -50,6 +51,7 @@ function ofpInfos(text) {
   const year = parseInt(datetime.substring(5,9), 10);
   const hours = parseInt(datetime.substring(10,12), 10);
   const minutes = parseInt(datetime.substring(12,14), 10);
+  const scheduledDeparture = new Date(Date.UTC(year, month, day, hours, minutes));
 
   const rawFplText = text
     .extract("ATC FLIGHT PLAN", "TRACKSNAT")
@@ -135,7 +137,12 @@ function ofpInfos(text) {
   pattern = /\|TRIP\s+(\d+)\s/u;
   match = pattern.exec(rawFS);
   const tripFuel = (match) ? parseInt(match[1], 10) : 0;
-
+  pattern = /\s+STA\s+([0-9]{4})/u;
+  match = pattern.exec(rawFS);
+  let station = (match) ? new Date(Date.UTC(year, month, day, parseInt(match[1].slice(0,2), 10), parseInt(match[1].slice(2), 10))): null;
+  if (station && station < scheduledDeparture) {
+    station = new Date(Date.UTC(year, month, day + 1, parseInt(match[1].slice(0,2), 10), parseInt(match[1].slice(2), 10)));
+  }
   //aircraft type
   let aircraft = "???";
   const aircraftTypes = { // convert to Oliver Ravet codes
@@ -218,9 +225,10 @@ function ofpInfos(text) {
     "flight": flight.replace(/\s/gu, ""),
     "departure": departure,
     "destination": destination,
-    "datetime": new Date(Date.UTC(year, month, day, hours, minutes)),
+    "datetime": scheduledDeparture,
     "takeoff": new Date(Date.UTC(year, month, day, hours , minutes + taxitime)),
     "landing": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime)),
+    station,
     "datetime2": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime + taxitime2)),
     "date": date,
     "ofp": ofp.replace("\xA9", ""),

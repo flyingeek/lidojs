@@ -17,6 +17,7 @@ test("infos", () => {
     expect(infos.takeoff.toISOString()).toEqual("2019-08-04T14:20:00.000Z");
     expect(infos.landing.toISOString()).toEqual("2019-08-05T00:58:00.000Z");
     expect(infos.datetime2.toISOString()).toEqual("2019-08-05T01:11:00.000Z");
+    expect(infos.station.toISOString()).toEqual("2019-08-05T01:20:00.000Z");
     expect(infos.des3).toEqual("SFO");
     expect(infos.ralts).toEqual(['BIKF', 'CYQX', 'CYEG']);
     expect(infos.alternates).toEqual(["KOAK"]);
