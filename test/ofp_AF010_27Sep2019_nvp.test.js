@@ -30,7 +30,7 @@ test("infos", () => {
   expect(infos.takeoff.toISOString()).toEqual("2019-09-27T15:14:00.000Z");
   expect(infos.landing.toISOString()).toEqual("2019-09-27T22:29:00.000Z");
   expect(infos.datetime2.toISOString()).toEqual("2019-09-27T23:20:00.000Z");
-  expect(infos.station.toISOString()).toEqual("2019-09-27T23:20:00.000Z");
+  expect(infos.STA.toISOString()).toEqual("2019-09-27T23:20:00.000Z");
   expect(infos.date).toEqual("27Sep2019");
   expect(infos.duration).toEqual([7, 15]);
   expect(infos.ralts).toEqual([]);

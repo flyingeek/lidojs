@@ -14,9 +14,10 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - destination (LFPG)
  - des3 IATA destination (CDG)
  - datetime (a javascript Date object for scheduled departure block time)
+ - STD is an alias for datetime
  - date (OFP text date 25Apr2016)
  - datetime2 (a javascript Date object for estimated arrival block time)
- - station (a javascript Date object for scheduled arrival block time)
+ - STA (a javascript Date object for scheduled arrival block time)
  - duration [hours, minutes] hours and minutes are Number
  - ofp (OFP number 9/0/1)
  - alternates an array of alternate
@@ -226,9 +227,11 @@ function ofpInfos(text) {
     "departure": departure,
     "destination": destination,
     "datetime": scheduledDeparture,
+    "STD": scheduledDeparture,
     "takeoff": new Date(Date.UTC(year, month, day, hours , minutes + taxitime)),
     "landing": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime)),
     station,
+    "STA": station,
     "datetime2": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime + taxitime2)),
     "date": date,
     "ofp": ofp.replace("\xA9", ""),
