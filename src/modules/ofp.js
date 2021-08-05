@@ -41,7 +41,7 @@ export class Ofp {
       }
       throw error;
     }
-    this.removePageFooterRegex = new RegExp(String.raw`([\s-]\d{1,2})?Page\s[0-9]+\s.+?Page\s[0-9]+.+?\/${this.infos['departure']}-${this.infos['destination']}`, 'gsu');
+    this.removePageFooterRegex = new RegExp(String.raw`([\s-]\d{1,2})?Page\s[0-9]+\s.+?Page\s[0-9]+.+?\/${this.infos['depICAO']}-${this.infos['destICAO']}`, 'gsu');
     this.text = text.replace(this.removePageFooterRegex,'');
     this.cache = function (name, fn) {
       if (this.cacheStore === undefined) {
@@ -56,7 +56,7 @@ export class Ofp {
 
   get description() {
     const infos = this.infos;
-    return `${infos.flight} ${infos.departure}-${infos.destination} ${infos.date} ${infos.datetime.toISOString().substring(11,16)}z OFP ${infos.ofp}`;
+    return `${infos.flightNo} ${infos.depICAO}-${infos.destICAO} ${infos.ofpTextDate} ${infos.ofpOUT.toISOString().substring(11,16)}z OFP ${infos.ofp}`;
   }
 
   /**
@@ -67,10 +67,10 @@ export class Ofp {
    */
   wptCoordinates(start="WPT COORDINATES") {
     const infos = this.infos;
-    const end = (this.ofpType === ofpTypes.NVP) ? '----' + infos['destination']: '----';
+    const end = (this.ofpType === ofpTypes.NVP) ? '----' + infos['destICAO']: '----';
     const extract = this.text.extract(start, end);
     const geoPoints = extract.matchAll(wptRegExp);
-    if (geoPoints.length > 0) geoPoints[0].name = this.infos['departure']; // avoid name problems
+    if (geoPoints.length > 0) geoPoints[0].name = this.infos['depICAO']; // avoid name problems
     return geoPoints;
   }
 
@@ -111,7 +111,7 @@ export class Ofp {
       eet[name.split('/')[0]] = [previousEET, previousFL];
       previousEET = (parseFloat(t.slice(0,2)) * 60) + parseFloat(t.slice(2))
     }
-    eet[this.infos['destination']] = [previousEET, previousFL];
+    eet[this.infos['destICAO']] = [previousEET, previousFL];
     //console.log(eet);
     const results = [];
     let error = false;
@@ -259,17 +259,16 @@ export class Ofp {
    */
   fpl() {
     const infos = this.infos;
-    let text = infos.rawfpl
-      .extract(`-${infos.departure}`, `-${infos.destination}`, false);
+    let text = infos.rawFPL.extract(`-${infos.depICAO}`, `-${infos.destICAO}`, false);
     text = text.substring(text.indexOf(" ") + 1);
-    let results = [infos.departure];
+    let results = [infos.depICAO];
     text.split(" ").map((v) => v.trim())
       .forEach((v) => {
         if (v !== "" && !v.startsWith("-N")){
           results.push(v);
         }
       });
-    results.push(infos.destination);
+    results.push(infos.destICAO);
     return results;
   }
 

@@ -137,8 +137,8 @@ export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSiz
  */
 export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     // timestamp for departure
-    const taxitime = ofp.infos['taxitime'];
-    const ts = (ofp.infos['datetime'].getTime() / 1000) + (taxitime * 60);
+    const taxitime = ofp.infos['taxiTimeOUT'];
+    const ts = (ofp.infos['ofpOUT'].getTime() / 1000) + (taxitime * 60);
     const now_ts = (new Date()).getTime() / 1000;
     const tref = Math.round(Math.max(ts, now_ts)); //for old ofp timeref=now
     const trefOfp = new Date(Math.round(ts) * 1000);
@@ -146,7 +146,7 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
     const dateTimeFormat = new Intl.DateTimeFormat('en', {'year': '2-digit', 'month': 'short', 'day': '2-digit', 'hour': '2-digit', 'minute': '2-digit', 'hourCycle': 'h24', 'timeZone': 'UTC'});
     const [{'value': month},,{'value': day},,{'value': year},,{'value': hour},,{'value': minute}] = dateTimeFormat.formatToParts(trefOfp);
-    const name = `Route Gramet ${ofp.infos['flight']} ${ofp.infos['departure']}-${ofp.infos['destination']} ${day}${month}${year} ${hour}:${minute}z OFP ${ofp.infos['ofp']}`;
+    const name = `Route Gramet ${ofp.infos['flightNo']} ${ofp.infos['depICAO']}-${ofp.infos['destICAO']} ${day}${month}${year} ${hour}:${minute}z OFP ${ofp.infos['ofp']}`;
     let hini = 0;
     let hfin = ofp.infos['duration'][0] + 1;
     const fl = ofp.infos['fl']; // average flight level

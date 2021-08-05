@@ -15,27 +15,30 @@ test("loadOFP", () => {
 
 test("infos", () => {
   const infos = ofp.infos;
-  expect(infos.rawfpl).toEqual(
+  expect(infos.rawFPL).toEqual(
     "(FPL-AFR010-IS -A388/H-SDE2E3GHIJ4J5M1P2RWXYZ/LB1D1 -LFPG1450 -N0480F260 ATREX3A ATREX UT225 VESAN UL613 SOVAT/N0502F380 UL613 SANDY UN601 LESTA UP6 RODOL UM65 TENSO L603 REMSI DCT GOMUP/M086F380 NATB LOMSI/N0498F380 DCT DANOL DCT ENE J121 SEY PARCH3 -KJFK0705 KBOS -PBN/A1B1C1D1L1O1S2 DAT/1FANSP2PDC SUR/RSP180 DOF/190927 REG/FHPJE EET/EGTT0019 EGPX0104 EGGX0129 58N020W0209 CZQX0249 57N040W0329 55N050W0415 LOMSI0449 CZUL0504 CZQM0546 KZBW0608 SEL/CPHQ CODE/39BD24 OPR/AFR PER/C RVR/075 RMK/ACAS TCAS)"
   );
-  expect(infos.flight).toEqual("AF010");
-  expect(infos.departure).toEqual("LFPG");
-  expect(infos.dep3).toEqual("CDG");
-  expect(infos.destination).toEqual("KJFK");
-  expect(infos.des3).toEqual("JFK");
+  expect(infos.flightNo).toEqual("AF010");
+  expect(infos.callsign).toEqual("AFR010");
+  expect(infos.depICAO).toEqual("LFPG");
+  expect(infos.depIATA).toEqual("CDG");
+  expect(infos.destICAO).toEqual("KJFK");
+  expect(infos.destIATA).toEqual("JFK");
   expect(infos.ofp).toEqual("6");
-  expect(infos.taxitime).toEqual(24);
-  expect(infos.taxitime2).toEqual(51);
-  expect(infos.datetime.toISOString()).toEqual("2019-09-27T14:50:00.000Z");
-  expect(infos.takeoff.toISOString()).toEqual("2019-09-27T15:14:00.000Z");
-  expect(infos.landing.toISOString()).toEqual("2019-09-27T22:29:00.000Z");
-  expect(infos.datetime2.toISOString()).toEqual("2019-09-27T23:20:00.000Z");
-  expect(infos.STA.toISOString()).toEqual("2019-09-27T23:20:00.000Z");
-  expect(infos.date).toEqual("27Sep2019");
+  expect(infos.taxiTimeOUT).toEqual(24);
+  expect(infos.taxiTimeIN).toEqual(51);
+  expect(infos.flightTime).toEqual(435);
+  expect(infos.blockTime).toEqual(510);
+  expect(infos.ofpOUT.toISOString()).toEqual("2019-09-27T14:50:00.000Z");
+  expect(infos.ofpOFF.toISOString()).toEqual("2019-09-27T15:14:00.000Z");
+  expect(infos.ofpON.toISOString()).toEqual("2019-09-27T22:29:00.000Z");
+  expect(infos.ofpIN.toISOString()).toEqual("2019-09-27T23:20:00.000Z");
+  expect(infos.scheduledIN.toISOString()).toEqual("2019-09-27T23:20:00.000Z");
+  expect(infos.ofpTextDate).toEqual("27Sep2019");
   expect(infos.duration).toEqual([7, 15]);
   expect(infos.ralts).toEqual([]);
   expect(infos.alternates).toEqual(["KBOS"]);
-  expect(infos.aircraft).toEqual("380");
+  expect(infos.aircraftType).toEqual("380");
 });
 
 test("fpl", () => {

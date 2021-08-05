@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable complexity */
 /* eslint-disable max-lines-per-function */
 
@@ -8,53 +9,54 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
 
 /**
  Dictionary of common OFP data:
- - flight (AF009)
- - departure (KJFK)
- - dep3 IATA departure (JFK)
- - destination (LFPG)
- - des3 IATA destination (CDG)
- - datetime (a javascript Date object for scheduled departure block time)
- - STD is an alias for datetime
- - date (OFP text date 25Apr2016)
- - datetime2 (a javascript Date object for estimated arrival block time)
- - STA (a javascript Date object for scheduled arrival block time)
- - duration [hours, minutes] hours and minutes are Number
+ - flightNo (AF009)
+ - callsign (AFR009)
+ - depICAO (KJFK)
+ - depIATA IATA departure (JFK)
+ - destICAO (LFPG)
+ - destIATA IATA destination (CDG)
+ - taxiTimeIN (departure taxi time in minutes)
+ - taxiTimeOUT (arrival taxi time in minutes)
+ - flightTime (ofp flight time in minutes)
+ - ofpOUT (a javascript Date object for scheduled departure block time)
+ - ofpOFF (ofpOUT + taxiTimeOUT)
+ - ofpON (ofpOUT + taxiTimeOUT + flightTime)
+ - ofpIN (ofpOUT + taxiTimeOUT + flightTime + taxiTimeIN)
+ - scheduledIN (a javascript Date object for scheduled arrival block time)
  - ofp (OFP number 9/0/1)
  - alternates an array of alternate
  - ralts an array of route alternates (ETOPS)
- - taxitime (departure taxi time in mn)
- - taxitime2 (arrival taxi time in mn)
- - rawfpl the raw text of the FPL
- - EEP the  ETOPS entry GeoPoint
- - EXP the ETOPS exit GeoPoint
+ - rawFPL the raw text of the FPL
+ - EEP the airport related to the ETOPS entry GeoPoint
+ - EXP the airport related to the ETOPS exit GeoPoint
  - raltPoints the ETOPS airports as GeoPoint
- - ETOPS the ETOPS time in minutes
+ - maxETOPS the ETOPS time in minutes
  - fl average flight level or 300
  - levels = array of flight levels found in FPL or [300]
- - payload
- - tripFuel
- - blockFuel
+ - payload in T
+ - tripFuel in T
+ - blockFuel in T
  * @param text The OFP in text format
- * @returns {{duration: number[], flight: string, datetime: Date, taxitime: number, destination: string, ofp: string, ralts: [], departure: string, alternates: [], rawfpl: string, dep3: string, des3: string, tripFuel: number, blockFuel: number, payload: number}}
+ * @returns {{flightNo: string, callsign: string, depICAO: string, depIATA: string, destICAO: string, destIATA: string, taxiTimeOUT: number, taxiTimeIN: number, ofpOUT: Date, ofpOFF: Date, ofpON: Date, ofpIN: Date, scheduledIN: Date, ofp: string, ralts: [] alternates: [], rawFPL: string, EEP: GeoPoint, EXP: GeoPoint, raltPoints: [GeoPoint], maxETOPS: number, fl: number, levels: [number], tripFuel: number, blockFuel: number, payload: number}}
  */
 function ofpInfos(text) {
-  let pattern = /(?<flight>AF\s+\S+\s+)(?<departure>\S{4})\/(?<destination>\S{4})\s+(?<datetime>\S+\/\S{4})z.*OFP\s+(?<ofp>\d+\S{0,8})/u;
+  let pattern = /(?<flight>AF\s+\S+\s+)(?<depICAO>\S{4})\/(?<destICAO>\S{4})\s+(?<datetime>\S+\/\S{4})z.*OFP\s+(?<ofp>\d+\S{0,8})/u;
   let match = pattern.exec(text);
   if (match === null) {
-    pattern = /(?<flight>AF.+)(?<departure>\S{4})\/(?<destination>\S{4})\s+(?<datetime>\S+\/\S{4})z.*OFP\s+(?<ofp>\S+)Main/u;
+    pattern = /(?<flight>AF.+)(?<depICAO>\S{4})\/(?<destICAO>\S{4})\s+(?<datetime>\S+\/\S{4})z.*OFP\s+(?<ofp>\S+)Main/u;
     match = pattern.exec(text);
   }
-  let {flight, departure, destination, datetime, ofp} = match.groups;
+  let {flight, depICAO, destICAO, datetime, ofp} = match.groups;
   // datetime is like 27Sep2019/1450
-  const [date] = datetime.split('/', 1);
+  const [ofpTextDate] = datetime.split('/', 1);
   const day = parseInt(datetime.substring(0,2), 10);
   const month = months3.indexOf(datetime.substring(2,5));
   const year = parseInt(datetime.substring(5,9), 10);
   const hours = parseInt(datetime.substring(10,12), 10);
   const minutes = parseInt(datetime.substring(12,14), 10);
-  const scheduledDeparture = new Date(Date.UTC(year, month, day, hours, minutes));
+  const ofpOUT = new Date(Date.UTC(year, month, day, hours, minutes));
 
-  const rawFplText = text
+  const rawFPL = text
     .extract("ATC FLIGHT PLAN", "TRACKSNAT")
     .extract("(", ")", false, true);
 
@@ -62,8 +64,8 @@ function ofpInfos(text) {
   pattern = new RegExp(String.raw`(?:-TRIP|SUMMARYTRIP)\s+[0-9]+[\s.]+([0-9]{4})\s`, "u");
   match = pattern.exec(text);
   if (match === null){
-    pattern = new RegExp(String.raw`-${destination}(\d{4})\s`, "u");
-    match = pattern.exec(rawFplText);
+    pattern = new RegExp(String.raw`-${destICAO}(\d{4})\s`, "u");
+    match = pattern.exec(rawFPL);
     duration = [1, 0];
     if (match === null) {
       console.log("flight duration not found, arbitrary set to 1 hour");
@@ -78,28 +80,28 @@ function ofpInfos(text) {
 
 
   // try with 2 alternates first
-  pattern = new RegExp(String.raw`-${destination}.+\s(\S{4})\s(\S{4})\s?[\n\-]`, "u");
-  match = pattern.exec(rawFplText);
+  pattern = new RegExp(String.raw`-${destICAO}.+\s(\S{4})\s(\S{4})\s?[\n\-]`, "u");
+  match = pattern.exec(rawFPL);
   let alternates = [];
   if (match !== null){
     alternates.push(match[1]);
     alternates.push(match[2]);
   } else {
-     pattern = new RegExp(String.raw`-${destination}.+\s(\S{4})\s?[\n\-]`, "u");
-     match = pattern.exec(rawFplText);
-     if (match !== null) {
-       alternates.push(match[1]);
-     }
+    pattern = new RegExp(String.raw`-${destICAO}.+\s(\S{4})\s?[\n\-]`, "u");
+    match = pattern.exec(rawFPL);
+    if (match !== null) {
+      alternates.push(match[1]);
+    }
   }
 
   pattern = /RALT\/((?:\S{4}[ \n])+)/u;
-  match = pattern.exec(rawFplText);
+  match = pattern.exec(rawFPL);
   let ralts = [];
   if (match !== null) {
     ralts = match[1].trim().split(/\s/u);
   }
 
-  let levels = [...rawFplText.matchAll(/F(\d{3})\s/ug)].map(v => (v[1]*1));
+  let levels = [...rawFPL.matchAll(/F(\d{3})\s/ug)].map(v => (v[1]*1));
   let fl = 300;
   if (levels && levels.length) {
       fl = Math.round(levels.reduce((a, b) => a + b, 0) / levels.length);
@@ -109,26 +111,26 @@ function ofpInfos(text) {
   const rawFS = text.extract("FLIGHT SUMMARY", "Generated");
   pattern = /\s(\d{2})(\d{2})\s+TAXI IN/u;
   match = pattern.exec(rawFS);
-  let taxitime = 15;
+  let taxiTimeOUT = 15;
   if (match === null) {
-    console.log("taxitime not found, arbitrary set to 15mn");
+    console.log("taxiTimeOUT not found, arbitrary set to 15mn");
   } else {
-    taxitime = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+    taxiTimeOUT = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
   }
-  let taxitime2= 15;
+  let taxiTimeIN= 15;
   pattern = /\/\s+(\d{2})(\d{2})MIN/u;
   match = pattern.exec(rawFS);
   if (match === null) {
     console.log("arrival taxitime not found, arbitrary set to 15mn");
   } else {
-    taxitime2 = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+    taxiTimeIN = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
   }
-  pattern = new RegExp(String.raw`\s${destination}/([A-Z]{3})\s\d{4}`, "u");
+  pattern = new RegExp(String.raw`\s${destICAO}/([A-Z]{3})\s\d{4}`, "u");
   match = pattern.exec(rawFS);
-  const des3 = (match) ? match[1] : '';
-  pattern = new RegExp(String.raw`\s${departure}/([A-Z]{3})\s\d{4}`, "u");
+  const destIATA = (match) ? match[1] : '';
+  pattern = new RegExp(String.raw`\s${depICAO}/([A-Z]{3})\s\d{4}`, "u");
   match = pattern.exec(rawFS);
-  const dep3 = (match) ? match[1] : '';
+  const depIATA = (match) ? match[1] : '';
   pattern = /\.PLD\s+(\d+)\s/u;
   match = pattern.exec(rawFS);
   const pld = (match) ? parseInt(match[1], 10) : 0;
@@ -140,12 +142,12 @@ function ofpInfos(text) {
   const tripFuel = (match) ? parseInt(match[1], 10) : 0;
   pattern = /\s+STA\s+([0-9]{4})/u;
   match = pattern.exec(rawFS);
-  let station = (match) ? new Date(Date.UTC(year, month, day, parseInt(match[1].slice(0,2), 10), parseInt(match[1].slice(2), 10))): null;
-  if (station && station < scheduledDeparture) {
-    station = new Date(Date.UTC(year, month, day + 1, parseInt(match[1].slice(0,2), 10), parseInt(match[1].slice(2), 10)));
+  let scheduledIN = (match) ? new Date(Date.UTC(year, month, day, parseInt(match[1].slice(0,2), 10), parseInt(match[1].slice(2), 10))): null;
+  if (scheduledIN && scheduledIN < ofpOUT) {
+    scheduledIN = new Date(Date.UTC(year, month, day + 1, parseInt(match[1].slice(0,2), 10), parseInt(match[1].slice(2), 10)));
   }
   //aircraft type
-  let aircraft = "???";
+  let aircraftType = "???";
   const aircraftTypes = { // convert to Oliver Ravet codes
     'A388': '380',
     'B772': '772',
@@ -171,24 +173,31 @@ function ofpInfos(text) {
     'A359': '350',
     'A35K': '350'
   }
-  pattern = /-([AB][0-9]{2}.)\//u
-  match = pattern.exec(rawFplText);
+  const flightNo = flight.replace(/\s/gu, "")
+  let callsign = flightNo;
+  pattern = /\(FPL-([^-]+)-/u
+  match = pattern.exec(rawFPL);
   if (match) {
-      aircraft = aircraftTypes[match[1]] || '???';
+      callsign = match[1];
+  }
+  pattern = /-([AB][0-9]{2}.)\//u
+  match = pattern.exec(rawFPL);
+  if (match) {
+      aircraftType = aircraftTypes[match[1]] || '???';
   }
   // aircraft registration
-  let registration = '';
+  let aircraftRegistration = '';
   pattern = /REG\/(\S+)/u
-  match = pattern.exec(rawFplText);
+  match = pattern.exec(rawFPL);
   if (match) {
-      registration = match[1][0] + '-' + match[1].slice(1);
+      aircraftRegistration = match[1][0] + '-' + match[1].slice(1);
   }
   // icao24
-  let icao24 = '';
+  let aircraftICAO24 = '';
   pattern = /CODE\/(\S+)/u
-  match = pattern.exec(rawFplText);
+  match = pattern.exec(rawFPL);
   if (match) {
-    icao24 = match[1];
+    aircraftICAO24 = match[1];
   }
   // eslint-disable-next-line init-declarations
   let exp;
@@ -222,36 +231,64 @@ function ofpInfos(text) {
         exp = match[1];
       }
   }
+  const ofpOFF = new Date(Date.UTC(year, month, day, hours , minutes + taxiTimeOUT));
+  const ofpON = new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxiTimeOUT));
+  const ofpIN = new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxiTimeOUT + taxiTimeIN));
   const infos = {
-    "flight": flight.replace(/\s/gu, ""),
-    "departure": departure,
-    "destination": destination,
-    "datetime": scheduledDeparture,
-    "STD": scheduledDeparture,
-    "takeoff": new Date(Date.UTC(year, month, day, hours , minutes + taxitime)),
-    "landing": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime)),
-    station,
-    "STA": station,
-    "datetime2": new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxitime + taxitime2)),
-    "date": date,
+    "flight": flightNo, /*deprecated */
+    flightNo,
+    callsign,
+
+    "departure": depICAO, /*deprecated */
+    "dep3": depIATA, /*deprecated */
+    "depICAO": depICAO,
+    "depIATA": depIATA,
+
+    "destination": destICAO, /*deprecated */
+    "des3": destIATA, /*deprecated */
+    "destICAO": destICAO,
+    "destIATA": destIATA,
+
+    "datetime": ofpOUT, /*deprecated */
+    "STD": ofpOUT, /*deprecated */
+    "takeoff": ofpOFF, /*deprecated */
+    "landing": ofpON, /*deprecated */
+    "station": scheduledIN, /*deprecated */
+    "STA": scheduledIN, /*deprecated */
+    "datetime2": ofpIN, /*deprecated */
+    ofpOUT,
+    ofpOFF,
+    ofpON,
+    ofpIN,
+    scheduledIN,
+    "flightTime": (ofpON.getTime() - ofpOFF.getTime()) / 60000,
+    "blockTime": (ofpIN.getTime() - ofpOUT.getTime()) / 60000,
+    "scheduledBlockTime": (scheduledIN) ? (scheduledIN.getTime() - ofpOUT.getTime()) / 60000 : 0,
+    "date": ofpTextDate, /* deprecated */
+    ofpTextDate,
     "ofp": ofp.replace("\xA9", ""),
-    "duration": duration,
+    "duration": duration,  /*deprecated */
     "alternates": alternates,
     "ralts": ralts,
     "raltPoints": [],
-    "taxitime": taxitime,
-    "taxitime2": taxitime2,
-    "rawfpl": rawFplText,
-    aircraft,
-    registration,
-    icao24,
+    "taxitime": taxiTimeOUT, /*deprecated */
+    "taxitime2": taxiTimeIN, /*deprecated */
+    taxiTimeOUT,
+    taxiTimeIN,
+    "rawfpl": rawFPL,/*deprecated */
+    rawFPL,
+    "aircraft": aircraftType,  /*deprecated */
+    aircraftType,
+    "registration": aircraftRegistration,  /*deprecated */
+    aircraftRegistration,
+    "icao24": aircraftICAO24,  /*deprecated */
+    aircraftICAO24,
     "EEP": null,
     "EXP": null,
-    "ETOPS": etopsTime,
+    "ETOPS": etopsTime,  /*deprecated */
+    "maxETOPS": etopsTime,
     fl,
     levels,
-    dep3,
-    des3,
     "payload": pld / 1000,
     "tripFuel": tripFuel / 1000,
     "blockFuel": blockFuel / 1000
