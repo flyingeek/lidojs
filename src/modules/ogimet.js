@@ -148,8 +148,8 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     const [{'value': month},,{'value': day},,{'value': year},,{'value': hour},,{'value': minute}] = dateTimeFormat.formatToParts(trefOfp);
     const name = `Route Gramet ${ofp.infos['flightNo']} ${ofp.infos['depICAO']}-${ofp.infos['destICAO']} ${day}${month}${year} ${hour}:${minute}z OFP ${ofp.infos['ofp']}`;
     let hini = 0;
-    let hfin = ofp.infos['duration'][0] + 1;
-    const fl = ofp.infos['fl']; // average flight level
+    let hfin = Math.ceil(ofp.infos.flightTime / 60);
+    const fl = ofp.infos.averageFL;
     const route = ogimetRoute(wmoGrid, ofp.route,{name, algorithm});
     const labels = route.points.filter(p => p.name !== "").map(p => p.name);
     route.description = labels.join(' ');

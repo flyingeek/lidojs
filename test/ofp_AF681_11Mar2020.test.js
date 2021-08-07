@@ -25,7 +25,6 @@ test("infos", () => {
     expect(infos.ofpIN.toISOString()).toEqual("2020-03-12T06:41:00.000Z");
     expect(infos.scheduledIN.toISOString()).toEqual("2020-03-12T06:55:00.000Z");
     expect(infos.ofpTextDate).toEqual("11Mar2020");
-    expect(infos.duration).toEqual([7, 34]);
     expect(infos.ralts).toEqual(['LPLA', 'EINN']);
     expect(infos.alternates).toEqual(["LFPO"]);
     expect(infos.aircraftType).toEqual("773");

@@ -18,7 +18,6 @@ test("infos", () => {
     expect(infos.ofpIN.toISOString()).toEqual("2020-03-12T06:26:00.000Z");
     expect(infos.scheduledIN).toBeNull();
     expect(infos.ofpTextDate).toEqual("11Mar2020");
-    expect(infos.duration).toEqual([7, 24]);
     expect(infos.flightTime).toEqual(444);
     expect(infos.blockTime).toEqual(471);
     expect(infos.taxiTimeOUT).toEqual(12);

@@ -24,14 +24,14 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - ofpIN (ofpOUT + taxiTimeOUT + flightTime + taxiTimeIN)
  - scheduledIN (a javascript Date object for scheduled arrival block time)
  - ofp (OFP number 9/0/1)
- - alternates an array of alternate
- - ralts an array of route alternates (ETOPS)
+ - alternates an array of alternate names
+ - ralts an array of route alternate names (ETOPS)
  - rawFPL the raw text of the FPL
  - EEP the airport related to the ETOPS entry GeoPoint
  - EXP the airport related to the ETOPS exit GeoPoint
  - raltPoints the ETOPS airports as GeoPoint
  - maxETOPS the ETOPS time in minutes
- - fl average flight level or 300
+ - averageFL average flight level or 300
  - levels = array of flight levels found in FPL or [300]
  - payload in T
  - tripFuel in T
@@ -102,11 +102,11 @@ function ofpInfos(text) {
   }
 
   let levels = [...rawFPL.matchAll(/F(\d{3})\s/ug)].map(v => (v[1]*1));
-  let fl = 300;
+  let averageFL = 300;
   if (levels && levels.length) {
-      fl = Math.round(levels.reduce((a, b) => a + b, 0) / levels.length);
+      averageFL = Math.round(levels.reduce((a, b) => a + b, 0) / levels.length);
   } else {
-    levels = [fl];
+    levels = [averageFL];
   }
   const rawFS = text.extract("FLIGHT SUMMARY", "Generated");
   pattern = /\s(\d{2})(\d{2})\s+TAXI IN/u;
@@ -235,27 +235,27 @@ function ofpInfos(text) {
   const ofpON = new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxiTimeOUT));
   const ofpIN = new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxiTimeOUT + taxiTimeIN));
   const infos = {
-    "flight": flightNo, /*deprecated */
+    //"flight": flightNo, /*deprecated */
     flightNo,
     callsign,
 
-    "departure": depICAO, /*deprecated */
-    "dep3": depIATA, /*deprecated */
+    //"departure": depICAO, /*deprecated */
+    //"dep3": depIATA, /*deprecated */
     "depICAO": depICAO,
     "depIATA": depIATA,
 
-    "destination": destICAO, /*deprecated */
-    "des3": destIATA, /*deprecated */
+    //"destination": destICAO, /*deprecated */
+    //"des3": destIATA, /*deprecated */
     "destICAO": destICAO,
     "destIATA": destIATA,
 
-    "datetime": ofpOUT, /*deprecated */
-    "STD": ofpOUT, /*deprecated */
-    "takeoff": ofpOFF, /*deprecated */
-    "landing": ofpON, /*deprecated */
-    "station": scheduledIN, /*deprecated */
-    "STA": scheduledIN, /*deprecated */
-    "datetime2": ofpIN, /*deprecated */
+    //"datetime": ofpOUT, /*deprecated */
+    //"STD": ofpOUT, /*deprecated */
+    //"takeoff": ofpOFF, /*deprecated */
+    //"landing": ofpON, /*deprecated */
+    //"station": scheduledIN, /*deprecated */
+    //"STA": scheduledIN, /*deprecated */
+    //"datetime2": ofpIN, /*deprecated */
     ofpOUT,
     ofpOFF,
     ofpON,
@@ -264,30 +264,30 @@ function ofpInfos(text) {
     "flightTime": (ofpON.getTime() - ofpOFF.getTime()) / 60000,
     "blockTime": (ofpIN.getTime() - ofpOUT.getTime()) / 60000,
     "scheduledBlockTime": (scheduledIN) ? (scheduledIN.getTime() - ofpOUT.getTime()) / 60000 : 0,
-    "date": ofpTextDate, /* deprecated */
+    //"date": ofpTextDate, /* deprecated */
     ofpTextDate,
     "ofp": ofp.replace("\xA9", ""),
-    "duration": duration,  /*deprecated */
+    //"duration": duration,  /*deprecated */
     "alternates": alternates,
     "ralts": ralts,
     "raltPoints": [],
-    "taxitime": taxiTimeOUT, /*deprecated */
-    "taxitime2": taxiTimeIN, /*deprecated */
+    //"taxitime": taxiTimeOUT, /*deprecated */
+    //"taxitime2": taxiTimeIN, /*deprecated */
     taxiTimeOUT,
     taxiTimeIN,
-    "rawfpl": rawFPL,/*deprecated */
+    //"rawfpl": rawFPL,/*deprecated */
     rawFPL,
-    "aircraft": aircraftType,  /*deprecated */
+    //"aircraft": aircraftType,  /*deprecated */
     aircraftType,
-    "registration": aircraftRegistration,  /*deprecated */
+    //"registration": aircraftRegistration,  /*deprecated */
     aircraftRegistration,
-    "icao24": aircraftICAO24,  /*deprecated */
+    //"icao24": aircraftICAO24,  /*deprecated */
     aircraftICAO24,
     "EEP": null,
     "EXP": null,
-    "ETOPS": etopsTime,  /*deprecated */
+    //"ETOPS": etopsTime,  /*deprecated */
     "maxETOPS": etopsTime,
-    fl,
+    averageFL,
     levels,
     "payload": pld / 1000,
     "tripFuel": tripFuel / 1000,
