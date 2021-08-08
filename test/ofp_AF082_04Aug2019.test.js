@@ -33,6 +33,7 @@ test("infos", () => {
     expect(infos.payload).toEqual(31.168);
     expect(infos.tripFuel).toEqual(79.501);
     expect(infos.blockFuel).toEqual(86.946);
+    expect(infos.minFuelMarginETOPS).toBeCloseTo(7.4, 3);
   });
   test('wptNamesEET', () => {
     const results = ofp.wptNamesEET(ofp.wptCoordinates());

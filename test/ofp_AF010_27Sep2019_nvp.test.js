@@ -38,6 +38,7 @@ test("infos", () => {
   expect(infos.ralts).toEqual([]);
   expect(infos.alternates).toEqual(["KBOS"]);
   expect(infos.aircraftType).toEqual("380");
+  expect(infos.minFuelMarginETOPS).toEqual(undefined);
 });
 
 test("fpl", () => {

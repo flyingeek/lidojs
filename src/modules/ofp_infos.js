@@ -31,6 +31,7 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - EXP the airport related to the ETOPS exit GeoPoint
  - raltPoints the ETOPS airports as GeoPoint
  - maxETOPS the ETOPS time in minutes
+ - minFuelMarginETOPS minimum fuel margin in T (extracted from ETOPS SUMMARY)
  - averageFL average flight level or 300
  - levels = array of flight levels found in FPL or [300]
  - payload in T
@@ -203,6 +204,8 @@ function ofpInfos(text) {
   let exp;
   // eslint-disable-next-line init-declarations
   let eep;
+  // eslint-disable-next-line init-declarations
+  let minFuelMarginETOPS;
   let etopsTime = 0;
   if (ralts.length > 0) {
       pattern = /ETOPS\s+(\d{3})\s/u
@@ -230,6 +233,8 @@ function ofpInfos(text) {
       if (match) {
         exp = match[1];
       }
+      pattern = /ETO\.{4}\s+([\d.]+)\/EFOB\s([\d.]+)/gu;
+      minFuelMarginETOPS = Math.min(...Array.from(etopsSummary.matchAll(pattern), m => parseFloat(m[2]) - parseFloat(m[1])));
   }
   const ofpOFF = new Date(Date.UTC(year, month, day, hours , minutes + taxiTimeOUT));
   const ofpON = new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxiTimeOUT));
@@ -287,6 +292,7 @@ function ofpInfos(text) {
     "EXP": null,
     //"ETOPS": etopsTime,  /*deprecated */
     "maxETOPS": etopsTime,
+    minFuelMarginETOPS,
     averageFL,
     levels,
     "payload": pld / 1000,
