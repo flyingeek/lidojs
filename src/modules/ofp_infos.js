@@ -141,8 +141,8 @@ function ofpInfos(text) {
   pattern = /\|TRIP\s+(\d+)\s/u;
   match = pattern.exec(rawFS);
   const tripFuel = (match) ? parseInt(match[1], 10) : 0;
-  pattern = new RegExp(String.raw`GND DIST\s\d+${ofpTextDate.toUpperCase()}`, "u");
-  match = pattern.exec(text);
+  pattern = new RegExp(String.raw`GND DIST\s+(\d+)${ofpTextDate.toUpperCase().substring(0,5)}`, "u");
+  match = pattern.exec(rawFS);
   const groundDistance = (match) ? parseInt(match[1], 10) : 0;
   pattern = /\s+STA\s+([0-9]{4})/u;
   match = pattern.exec(rawFS);

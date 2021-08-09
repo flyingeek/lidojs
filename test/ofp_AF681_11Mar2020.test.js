@@ -35,6 +35,7 @@ test("infos", () => {
     expect(infos.payload).toEqual(29.500);
     expect(infos.tripFuel).toEqual(51.013);
     expect(infos.blockFuel).toEqual(58.869);
+    expect(infos.groundDistance).toEqual(3992);
     expect(infos.minFuelMarginETOPS).toBeCloseTo(4.1, 3);
   });
 
