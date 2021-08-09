@@ -8,3 +8,6 @@ export {KMLGenerator} from "./modules/kml";
 export {Ofp} from "./modules/ofp";
 export {GEO_HASH_GRID_SIZE, GeoGridIndex} from "./modules/geoindex";
 export {ogimetRoute, ogimetData} from "./modules/ogimet";
+export {months3} from "./modules/ofp_infos";
+export {StringExtractException, extract} from "./modules/ofp_extensions";
+export {iata2GeoPoint} from "./modules/iata2icao";

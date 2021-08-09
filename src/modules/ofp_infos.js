@@ -141,6 +141,9 @@ function ofpInfos(text) {
   pattern = /\|TRIP\s+(\d+)\s/u;
   match = pattern.exec(rawFS);
   const tripFuel = (match) ? parseInt(match[1], 10) : 0;
+  pattern = new RegExp(String.raw`GND DIST\s\d+${ofpTextDate.toUpperCase()}`, "u");
+  match = pattern.exec(text);
+  const groundDistance = (match) ? parseInt(match[1], 10) : 0;
   pattern = /\s+STA\s+([0-9]{4})/u;
   match = pattern.exec(rawFS);
   let scheduledIN = (match) ? new Date(Date.UTC(year, month, day, parseInt(match[1].slice(0,2), 10), parseInt(match[1].slice(2), 10))): null;
@@ -239,6 +242,7 @@ function ofpInfos(text) {
   const ofpOFF = new Date(Date.UTC(year, month, day, hours , minutes + taxiTimeOUT));
   const ofpON = new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxiTimeOUT));
   const ofpIN = new Date(Date.UTC(year, month, day, hours + duration[0], minutes + duration[1] + taxiTimeOUT + taxiTimeIN));
+
   const infos = {
     //"flight": flightNo, /*deprecated */
     flightNo,
@@ -297,7 +301,8 @@ function ofpInfos(text) {
     levels,
     "payload": pld / 1000,
     "tripFuel": tripFuel / 1000,
-    "blockFuel": blockFuel / 1000
+    "blockFuel": blockFuel / 1000,
+    groundDistance
   }
   try {
     infos['raltPoints'] = [];
@@ -323,4 +328,4 @@ function ofpInfos(text) {
   }
   return infos
 }
-export {ofpInfos};
+export {ofpInfos, months3};

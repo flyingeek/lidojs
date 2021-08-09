@@ -6,6 +6,42 @@ import {GeoPoint, dm_normalizer} from "./geopoint";
 class StringExtractException extends Error {}
 
 /**
+ * Extract text between start and end mark
+ * @param text: String
+ * @param start: String
+ * @param end: String
+ * @param endIsOptional: if end is missing, captures till EOF
+ * @param inclusive: if true, captures start and end
+ * @return String
+ */
+function extract(text, start, end, endIsOptional = true, inclusive = false) {
+  let from = 0;
+  let to = 0;
+  if (start) {
+    from = text.indexOf(start);
+    if (from === -1) {
+      throw new StringExtractException(`${start} not found`);
+    }
+    if (!inclusive) {
+      from += start.length;
+    }
+  }
+  if (!end) {
+    return text.substring(from);
+  }
+  to = text.indexOf(end, from);
+  if (to === -1) {
+    if (endIsOptional) {
+      return text.substring(from);
+    }
+    throw new StringExtractException(`${end} not found`);
+  } else if (inclusive) {
+    to += end.length;
+  }
+  return text.substring(from, to);
+}
+
+/**
  * Defines an extract method on the String prototype
  * Extract text between start and end mark
  * @param text: String
@@ -17,30 +53,7 @@ class StringExtractException extends Error {}
  */
 Reflect.defineProperty(String.prototype, 'extract', {
   value(start, end, endIsOptional = true, inclusive = false) {
-    let from = 0;
-    let to = 0;
-    if (start) {
-      from = this.indexOf(start);
-      if (from === -1) {
-        throw new StringExtractException(`${start} not found`);
-      }
-      if (!inclusive) {
-        from += start.length;
-      }
-    }
-    if (!end) {
-      return this.substring(from);
-    }
-    to = this.indexOf(end, from);
-    if (to === -1) {
-      if (endIsOptional) {
-        return this.substring(from);
-      }
-      throw new StringExtractException(`${end} not found`);
-    } else if (inclusive) {
-      to += end.length;
-    }
-    return this.substring(from, to);
+    return extract(this, start, end, endIsOptional, inclusive);
   }
 });
 
@@ -80,4 +93,4 @@ class WptRegExp extends RegExp {
 }
 const wptRegExp = new WptRegExp(String.raw`(\S+|\s+)\s+([NS]\d{4}\.\d)([EW]\d{5}\.\d)`, 'gu');
 
-export {wptRegExp};
+export {wptRegExp, StringExtractException, extract};
