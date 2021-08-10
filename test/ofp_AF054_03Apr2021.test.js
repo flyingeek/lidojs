@@ -18,7 +18,7 @@ test("infos", () => {
     );
     expect(infos.flightNo).toEqual("AF054");
     expect(infos.inFlightReleased).toBeTruthy();
-    expect(infos.InFlightStart).toEqual('ETIKI');
+    expect(infos.inFlightStart).toEqual('ETIKI');
     expect(infos.depICAO).toEqual('LFPG');
     expect(infos.depIATA).toEqual('CDG');
     expect(infos.taxiTimeOUT).toEqual(0);
@@ -52,4 +52,9 @@ test("wptCoordinates", () => {
 test('wptNamesEET', () => {
     const results = ofp.wptNamesEET(ofp.wptCoordinates());
     expect(results.length === 0).toBeFalsy();
+});
+
+
+test("lidoRoute", () => {
+    expect(ofp.lidoRoute().join(" ")).toEqual("ETIKI N4800.0W01500.0 N4800.0W02000.0 N4700.0W03000.0 N4500.0W04000.0 N4400.0W05000.0 N4200.0W06000.0 DOVEY DCT JFK DCT ARD DCT MUDNE V419 MXE N3957.9W07637.5 N3949.6W07655.3 N3947.1W07700.7 N3941.0W07713.5 N3924.6W07721.8 N3916.0W07721.6 N3909.9W07721.5 N3854.5W07721.4 N3840.8W07721.7 KIAD KBWI EINN CYYT");
 });

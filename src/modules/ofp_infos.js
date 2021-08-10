@@ -39,8 +39,9 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - tripFuel in T
  - blockFuel in T
  - inFlightReleased is true when the OFP is released while in flight
+ - inFlightStart is the start point name for ofp released in flight
  * @param text The OFP in text format
- * @returns {{flightNo: string, callsign: string, depICAO: string, depIATA: string, destICAO: string, destIATA: string, taxiTimeOUT: number, taxiTimeIN: number, ofpOUT: Date, ofpOFF: Date, ofpON: Date, ofpIN: Date, scheduledIN: Date, ofp: string, ralts: [] alternates: [], rawFPL: string, EEP: GeoPoint, EXP: GeoPoint, raltPoints: [GeoPoint], maxETOPS: number, fl: number, levels: [number], tripFuel: number, blockFuel: number, payload: number, inFlightReleased: boolean}}
+ * @returns {{flightNo: string, callsign: string, depICAO: string, depIATA: string, destICAO: string, destIATA: string, taxiTimeOUT: number, taxiTimeIN: number, ofpOUT: Date, ofpOFF: Date, ofpON: Date, ofpIN: Date, scheduledIN: Date, ofp: string, ralts: [] alternates: [], rawFPL: string, EEP: GeoPoint, EXP: GeoPoint, raltPoints: [GeoPoint], maxETOPS: number, fl: number, levels: [number], tripFuel: number, blockFuel: number, payload: number, inFlightReleased: boolean, inFlightStart: string}}
  */
 function ofpInfos(text) {
   let pattern = /(?<flight>AF\s+\S+\s+)(?<depICAO>\S{4})\/(?<destICAO>\S{4})\s+(?<datetime>\S+\/\S{4})z.*OFP\s+(?<ofp>\d+\S{0,8})/u;
@@ -115,14 +116,14 @@ function ofpInfos(text) {
   }
   const rawFS = text.extract("FLIGHT SUMMARY", "Generated");
   // eslint-disable-next-line init-declarations
-  let InFlightStart;
+  let inFlightStart;
   // eslint-disable-next-line init-declarations
   let InFlightStartETO;
   if (inFlightReleased) {
     pattern = new RegExp(String.raw`ATC:${callsign}\s+(\S+)\s+\d{4}\s+\.{4}\s+(\d{2})(\d{2})`, "u");
     match = pattern.exec(rawFS);
     if (match) {
-      InFlightStart = match[1];
+      inFlightStart = match[1];
       InFlightStartETO = new Date(Date.UTC(year, month, day, parseInt(match[2], 10), parseInt(match[3], 10)))
     }
   }
@@ -314,7 +315,7 @@ function ofpInfos(text) {
     "blockFuel": blockFuel / 1000,
     groundDistance,
     inFlightReleased,
-    InFlightStart
+    inFlightStart
   }
   try {
     infos['raltPoints'] = [];
