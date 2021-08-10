@@ -395,7 +395,7 @@ export class Ofp {
         }
       });
       lidoPoints.push(destination);
-      lidoPoints.unshift(departure);
+      lidoPoints.unshift((!this.infos.inFlightStart) ? departure : this.infos.inFlightStart);
       // adds alternates and ralts
       lidoPoints = lidoPoints.concat(...this.infos.alternates);
       lidoPoints= lidoPoints.concat(...this.infos.ralts);
