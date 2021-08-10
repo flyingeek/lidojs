@@ -10,4 +10,4 @@ export {GEO_HASH_GRID_SIZE, GeoGridIndex} from "./modules/geoindex";
 export {ogimetRoute, ogimetData} from "./modules/ogimet";
 export {months3} from "./modules/ofp_infos";
 export {StringExtractException, extract} from "./modules/ofp_extensions";
-export {iata2GeoPoint} from "./modules/iata2icao";
+export {iata2GeoPoint, icao2iata, iata2icao} from "./modules/iata2icao";
