@@ -37,6 +37,7 @@ test("infos", () => {
     expect(infos.blockFuel).toEqual(58.869);
     expect(infos.groundDistance).toEqual(3992);
     expect(infos.minFuelMarginETOPS).toBeCloseTo(4.1, 3);
+    expect(infos.inFlightReleased).toBeFalsy();
   });
 
 test('wptNamesEET', () => {

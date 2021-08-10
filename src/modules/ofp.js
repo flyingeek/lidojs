@@ -70,7 +70,13 @@ export class Ofp {
     const end = (this.ofpType === ofpTypes.NVP) ? '----' + infos['destICAO']: '----';
     const extract = this.text.extract(start, end);
     const geoPoints = extract.matchAll(wptRegExp);
-    if (geoPoints.length > 0) geoPoints[0].name = this.infos['depICAO']; // avoid name problems
+    if (geoPoints.length > 0) {
+      if (!infos.inFlightReleased) {
+        geoPoints[0].name = this.infos['depICAO']; // avoid name problems
+      } else if (infos.inFlightStart) {
+        geoPoints[0].name = infos.inFlightStart;
+      }
+    }
     return geoPoints;
   }
 

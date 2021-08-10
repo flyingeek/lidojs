@@ -40,6 +40,7 @@ test("infos", () => {
   expect(infos.aircraftType).toEqual("380");
   expect(infos.groundDistance).toEqual(3336);
   expect(infos.minFuelMarginETOPS).toEqual(undefined);
+  expect(infos.inFlightReleased).toBeFalsy();
 });
 
 test("fpl", () => {
