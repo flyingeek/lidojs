@@ -68,6 +68,8 @@ function dm_normalizer(mixedValue) {
     }
     return new LatLng(dm2decimal(lat), dm2decimal(lng))
 }
+const arincRegex = /^([NESW]\d{4}|\d[NESW]\d{3}|\d{4}[NS]\d{3,5}[EW]|\d{2}[NS]\d{3}[EW])$/u;
+const isARINC = (label) => label.match(arincRegex);
 
 /**
  * Normalize ARINC point into LatLng
@@ -372,4 +374,4 @@ class GeoPoint {
     }
 }
 
-export {array_normalizer, dm_normalizer, arinc_normalizer, GeoPoint,dm2decimal,km_to_nm, km_to_rad, nm_to_rad, rad_to_km, rad_to_nm, rad_to_deg, NM, R};
+export {array_normalizer, dm_normalizer, arinc_normalizer, isARINC, GeoPoint,dm2decimal,km_to_nm, km_to_rad, nm_to_rad, rad_to_km, rad_to_nm, rad_to_deg, NM, R};

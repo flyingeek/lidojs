@@ -5,6 +5,7 @@ import {
   arinc_normalizer, array_normalizer,
   dm2decimal,
   dm_normalizer,
+  isARINC,
   km_to_nm, km_to_rad, nm_to_rad, rad_to_km, rad_to_nm
 } from "../src/modules/geopoint";
 import {LatLng, PhiLam, philam2latlng} from "../src/modules/geolite";
@@ -176,4 +177,14 @@ test("getCenter", () => {
 test("circle", () => {
   const g = new GeoPoint([0, 90]);
   expect(g.circle(420).length).toEqual(65);
-})
+});
+
+test("isARINC", () => {
+  expect(isARINC('')).toBeFalsy();
+  expect(isARINC('NOPSI')).toBeFalsy();
+  expect(isARINC('N5520')).toBeTruthy();
+  expect(isARINC('5N520')).toBeTruthy();
+  expect(isARINC('5530N020W')).toBeTruthy();
+  expect(isARINC('5530N02000W')).toBeTruthy();
+  expect(isARINC('55N020W')).toBeTruthy();
+});
