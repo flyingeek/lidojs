@@ -170,11 +170,6 @@ export class Ofp {
       extract = extract.split("REMARKS:", 1)[0];
       extract = extract.split("Generated at", 1)[0];
     }
-    if (extract.includes("NAT EASTBND TRACKS")) {
-      infos.direction = "EAST";
-    } else if (extract.includes("NAT WESTBND TRACKS")) {
-      infos.direction = "WEST";
-    }
     if (extract.includes(" LVLS ")) {
       // split at track letter, discard first part
       const a = extract.split(/(?:\s|[^A-Z\d])([A-Z])\s{3}/gu).slice(1);
@@ -253,6 +248,8 @@ export class Ofp {
               }
             }
           });
+        if (description.match(/RTS WEST/u)) infos.direction = "WEST";
+        if (description.match(/RTS EAST/u)) infos.direction = "EAST";
         tracks.push(new Track(trackRoute,
           {
             "name": `NAT ${letter}`,
