@@ -158,6 +158,7 @@ export class Ofp {
    */
   trackParser() {
     let extract = "";
+    const infos = {};
     try {
       extract = this.text
         .extract("ATC FLIGHT PLAN", "NOTES:").extract(')');
@@ -168,6 +169,11 @@ export class Ofp {
     if (extract.includes("REMARKS:")) {
       extract = extract.split("REMARKS:", 1)[0];
       extract = extract.split("Generated at", 1)[0];
+    }
+    if (extract.includes("NAT EASTBND TRACKS")) {
+      infos.direction = "EAST";
+    } else if (extract.includes("NAT WESTBND TRACKS")) {
+      infos.direction = "WEST";
     }
     if (extract.includes(" LVLS ")) {
       // split at track letter, discard first part
@@ -180,7 +186,7 @@ export class Ofp {
       console.error("Unknown TRACKSNAT message format");
       console.log(extract);
     }
-    return results;
+    return {results, infos};
   }
 
   /**
@@ -189,7 +195,7 @@ export class Ofp {
    */
   get tracks() {
     return this.cache("tracks", () => {
-      let parserResults = this.trackParser();
+      const {results, infos} = this.trackParser();
       const pattern = /(\d{2,4}[NS]\d{3,5}[EW]|[NESW]\d{4}|\d[NESW]\d{3}[^EW])/u;
       let fishPoints = {};
       let tracks = [];
@@ -197,7 +203,7 @@ export class Ofp {
       //find unknows named waypoints in tracks
       let unknowns = [];
       // eslint-disable-next-line array-callback-return
-      parserResults.map(([, description]) => {
+      results.map(([, description]) => {
         description.split(" LVLS ", 1)[0].split(" ")
           .forEach((p) => {
             const label = p.trim();
@@ -216,7 +222,7 @@ export class Ofp {
         }
       });
 
-      parserResults.forEach(([letter, description]) => {
+      results.forEach(([letter, description]) => {
         let trackRoute = [];
         let trackIsComplete = true;
         const isMine = this.isMyTrack(letter);
@@ -252,7 +258,8 @@ export class Ofp {
             "name": `NAT ${letter}`,
             "description": description,
             "isMine": isMine,
-            "isComplete": trackIsComplete
+            "isComplete": trackIsComplete,
+            infos
           }));
       });
       return tracks;

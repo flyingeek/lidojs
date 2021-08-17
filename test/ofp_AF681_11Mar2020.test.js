@@ -44,3 +44,8 @@ test('wptNamesEET', () => {
   const results = ofp.wptNamesEET(ofp.wptCoordinates());
   expect(results.length === 0).toBeFalsy();
 });
+
+test('tracks', () => {
+  let tracks = ofp.tracks;
+  expect(tracks[1].infos.direction).toEqual("EAST");
+});

@@ -138,10 +138,11 @@ class Track extends Route {
      * @param {boolean} [options.isComplete=true] - true when there is no missing points in the track
      */
     constructor(points, options) {
-        let {isMine=false, isComplete=true} = options || {};
+        let {isMine=false, isComplete=true, infos={}} = options || {};
         super(points, options);
         this.isMine = isMine;
         this.isComplete = isComplete;
+        this.infos = infos;
     }
 
     // eslint-disable-next-line class-methods-use-this

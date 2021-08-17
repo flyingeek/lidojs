@@ -83,7 +83,7 @@ test("wptCoordinatesAlternate", () => {
 });
 
 test("trackParser", () => {
-  expect(ofp.trackParser().length).toEqual(5);
+  expect(ofp.trackParser().results.length).toEqual(5);
 });
 
 test("tracks", () => {
@@ -96,6 +96,7 @@ test("tracks", () => {
   expect(tracks[1].isMine).toBeTruthy();
   expect(tracks[1].isComplete).toBeTruthy();
   expect(tracks[1].points.length).toEqual(6);
+  expect(tracks[1].infos.direction).toEqual("WEST");
 });
 
 test("lidoRoute", () => {
