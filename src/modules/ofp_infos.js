@@ -197,7 +197,7 @@ function ofpInfos(text) {
     'BCS1': '220',
     'BCS3': '220'
   }
-  pattern = /-([AB][0-9]{2}.)\//u
+  pattern = /-([AB][0-9]{2}.|BCS\d)\//u
   match = pattern.exec(rawFPL);
   if (match) {
       aircraftType = aircraftTypes[match[1]] || '???';
