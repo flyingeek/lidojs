@@ -238,7 +238,7 @@ function ofpInfos(text) {
           console.log("ETOPS range not found");
         }
       }
-      const etopsSummary = text.extract("ETOPS SUMMARY", "Generated");
+      const etopsSummary = text.extract("ETOPS SUMMARY", "--FLIGHT LOG");
       pattern = /EEP\((\S{4})\)/u;
       match = pattern.exec(etopsSummary);
       if (match) {
