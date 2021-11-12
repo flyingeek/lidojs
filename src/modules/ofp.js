@@ -175,7 +175,11 @@ export class Ofp {
       const a = extract.split(/(?:\s|[^A-Z\d])([A-Z])\s{3}/gu).slice(1);
       // results are [trackLetter, trackDescription]
       for (let i = 0, max = a.length; i < max; i += 2) {
-        results.push([a[i], a[i + 1]]);
+        let trackDescription = a[i + 1];
+        if (trackDescription.includes(" NOTES:")){
+          trackDescription = trackDescription.split(" NOTES:", 1)[0];
+        }
+        results.push([a[i], trackDescription]);
       }
     } else if (extract.includes('TRACKS')) {
       console.error("Unknown TRACKSNAT message format");
@@ -248,15 +252,16 @@ export class Ofp {
               }
             }
           });
-        if (description.match(/RTS WEST/u)) infos.direction = "WEST";
-        if (description.match(/RTS EAST/u)) infos.direction = "EAST";
+        let direction = "";
+        if (description.match(/RTS WEST/u)) direction = "WEST";
+        if (description.match(/RTS EAST/u)) direction = "EAST";
         tracks.push(new Track(trackRoute,
           {
             "name": `NAT ${letter}`,
             "description": description,
             "isMine": isMine,
             "isComplete": trackIsComplete,
-            infos
+            "infos": {...infos, direction}
           }));
       });
       return tracks;
