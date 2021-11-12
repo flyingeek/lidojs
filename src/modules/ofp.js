@@ -161,7 +161,7 @@ export class Ofp {
     const infos = {};
     try {
       extract = this.text
-        .extract("ATC FLIGHT PLAN", "NOTES:").extract(')');
+        .extract("ATC FLIGHT PLAN").extract(')');
     } catch (e) {
       return [];
     }
