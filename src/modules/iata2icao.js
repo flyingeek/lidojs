@@ -48,7 +48,7 @@ export function tzOffset(iata, isoString) {
         if (offset === 0) {
             return "+0";
         }
-        let res = (offset >= 0) ? '+' : '-';
+        let res = (offset >= 0) ? '+' : '';
         res += offset.toFixed(1)
         return (res.endsWith('.0')) ? res.slice(0, -2) : res;
     }

@@ -26,4 +26,5 @@ test('tzOffset', () => {
     expect(tzOffset('CDG', '2021-08-01T14:00Z')).toBe('+2');
     expect(tzOffset('CDG', '2021-12-01T14:00Z')).toBe('+1');
     expect(tzOffset('DEL', '2021-12-01T14:00Z')).toBe('+5.5');
+    expect(tzOffset('IAD', '2021-12-01T14:00Z')).toBe('-5');
 });
