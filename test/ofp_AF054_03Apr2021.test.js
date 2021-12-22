@@ -28,6 +28,7 @@ test("infos", () => {
     expect(infos.ofpIN.toISOString()).toEqual("2021-04-03T19:41:00.000Z");
     expect(infos.blockTime).toEqual(481); //8h01
     expect(infos.flightTime).toEqual(395); //6h35
+    expect(infos.flightTypeAircraft).toEqual('LC');
 });
 
 test("wptCoordinates", () => {

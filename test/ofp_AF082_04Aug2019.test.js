@@ -35,6 +35,7 @@ test("infos", () => {
     expect(infos.blockFuel).toEqual(86.946);
     expect(infos.minFuelMarginETOPS).toBeCloseTo(7.4, 3);
     expect(infos.inFlightReleased).toBeFalsy();
+    expect(infos.flightTypeAircraft).toEqual('LC');
   });
   test('wptNamesEET', () => {
     const results = ofp.wptNamesEET(ofp.wptCoordinates());

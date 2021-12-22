@@ -2,8 +2,10 @@
 /* eslint-disable complexity */
 /* eslint-disable max-lines-per-function */
 
+import {getFlightTypePNT, parseDuties} from './pairing';
+import {iata2tz, icao2iata} from './iata2icao';
 import {GeoPoint} from './geopoint';
-import {icao2iata} from './iata2icao';
+import {StringExtractException} from "./ofp_extensions";
 const AIRPORTS = require('./airports');
 
 const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -41,7 +43,7 @@ const months3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", 
  - inFlightReleased is true when the OFP is released while in flight
  - inFlightStart is the start point name for ofp released in flight
  * @param text The OFP in text format
- * @returns {{flightNo: string, callsign: string, depICAO: string, depIATA: string, destICAO: string, destIATA: string, taxiTimeOUT: number, taxiTimeIN: number, ofpOUT: Date, ofpOFF: Date, ofpON: Date, ofpIN: Date, scheduledIN: Date, ofp: string, ralts: [] alternates: [], rawFPL: string, EEP: GeoPoint, EXP: GeoPoint, raltPoints: [GeoPoint], maxETOPS: number, fl: number, levels: [number], tripFuel: number, blockFuel: number, payload: number, inFlightReleased: boolean, inFlightStart: string}}
+ * @returns {{flightNo: string, callsign: string, depICAO: string, depIATA: string, destICAO: string, destIATA: string, taxiTimeOUT: number, taxiTimeIN: number, ofpOUT: Date, ofpOFF: Date, ofpON: Date, ofpIN: Date, scheduledIN: Date, ofp: string, ralts: [] alternates: [], rawFPL: string, EEP: GeoPoint, EXP: GeoPoint, raltPoints: [GeoPoint], maxETOPS: number, fl: number, levels: [number], tripFuel: number, blockFuel: number, payload: number, inFlightReleased: boolean, inFlightStart: string, flightTypeAircraft: string, aircraftType: string}}
  */
 function ofpInfos(text) {
   let pattern = /(?<flight>AF\s+\S+\s+)(?<depICAO>\S{4})\/(?<destICAO>\S{4})\s+(?<datetime>\S+\/\S{4})z.*OFP\s+(?<ofp>\d+\S{0,8})/u;
@@ -202,6 +204,7 @@ function ofpInfos(text) {
   if (match) {
       aircraftType = aircraftTypes[match[1]] || '???';
   }
+  const flightTypeAircraft = (['220', '318', '319', '320', '321'].includes(aircraftType)) ? "MC" : "LC";
   // aircraft registration
   let aircraftRegistration = '';
   pattern = /REG\/(\S+)/u
@@ -256,7 +259,32 @@ function ofpInfos(text) {
   const ofpOFF = (!InFlightStartETO) ? new Date(ofpOUT.getTime() + taxiTimeOUT * 60000) : InFlightStartETO;
   const ofpON = new Date(ofpOFF.getTime() + flightTime * 60000);
   const ofpIN = new Date(ofpON.getTime() + taxiTimeIN * 60000);
-
+  const tzdb = {};
+  let flightTypePNT = null;
+  try {
+      const pairingText = text.extract('CREW PAIRING', 'Generated');
+      pattern = /DATE\s:\s(\d+)\.(\S{3})\.(\d{4})/u;
+      match = pattern.exec(pairingText);
+      if (match) {
+          const y = parseInt(match[3], 10);
+          const m = months3.indexOf(match[2]) + 1; // 1-12
+          if (m <= 0) throw new Error('could not extract pairing month');
+          const duties = parseDuties(pairingText, y, m);
+          flightTypePNT = getFlightTypePNT(duties);
+          for (const duty of duties) {
+            if (duty.legs && duty.legs.length > 0) {
+              const iata = duty.legs[0].depIATA;
+              tzdb[iata] = iata2tz(iata);
+            }
+          }
+      } else {
+          throw new Error('could not extract pairing month/year');
+      }
+  } catch (err) {
+      if (!(err instanceof StringExtractException)) {
+          console.error(err);
+      }
+  }
   const infos = {
     //"flight": flightNo, /*deprecated */
     flightNo,
@@ -302,6 +330,7 @@ function ofpInfos(text) {
     rawFPL,
     //"aircraft": aircraftType,  /*deprecated */
     aircraftType,
+    flightTypeAircraft,
     //"registration": aircraftRegistration,  /*deprecated */
     aircraftRegistration,
     //"icao24": aircraftICAO24,  /*deprecated */
@@ -318,7 +347,9 @@ function ofpInfos(text) {
     "blockFuel": blockFuel / 1000,
     groundDistance,
     inFlightReleased,
-    inFlightStart
+    inFlightStart,
+    flightTypePNT,
+    tzdb
   }
   try {
     infos['raltPoints'] = [];

@@ -38,6 +38,7 @@ test("infos", () => {
     expect(infos.groundDistance).toEqual(3992);
     expect(infos.minFuelMarginETOPS).toBeCloseTo(4.1, 3);
     expect(infos.inFlightReleased).toBeFalsy();
+    expect(infos.flightTypeAircraft).toEqual('LC');
   });
 
 test('wptNamesEET', () => {

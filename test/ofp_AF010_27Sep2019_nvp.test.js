@@ -41,6 +41,7 @@ test("infos", () => {
   expect(infos.groundDistance).toEqual(3336);
   expect(infos.minFuelMarginETOPS).toEqual(undefined);
   expect(infos.inFlightReleased).toBeFalsy();
+  expect(infos.flightTypeAircraft).toEqual('LC');
 });
 
 test("fpl", () => {
