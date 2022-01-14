@@ -121,23 +121,31 @@ export class Ofp {
     //console.log(eet);
     const results = [];
     let error = false;
+    const tryAlts = (altnames) => {
+      for (const altFn of altnames) {
+        const altname = altFn();
+        if (altname !== null && eet[altname] !== undefined) {
+          return eet[altname];
+        }
+      }
+      return undefined;
+    }
     for (const p of geoPoints) {
       if (eet[p.name] === undefined) {
-          let altname = p.name.replace(/00\.0/gu,'')
-          if (eet[altname] === undefined) {
-              altname = p.name.replace(/\.0/gu,'')
-              if (eet[altname] === undefined) {
-                console.log('missing point', p.name);
-                error = true;
-                break;
-              } else {
-                results.push([p, ...eet[altname]]);
-              }
-          } else {
-            results.push([p, ...eet[altname]])
-          }
+        const alternative = tryAlts([
+          () => p.name.replace(/00\.0/gu,''),
+          () => p.name.replace(/\.0/gu,''),
+          () => ((p.name === 'N5928.0W10155.4') ? 'N5928W10155' : null),
+        ]);
+        if (alternative) {
+          results.push([p, ...alternative]);
+        } else {
+          console.log('missing point', p.name);
+          error = true;
+          break;
+        }
       } else {
-          results.push([p, ...eet[p.name]])
+          results.push([p, ...eet[p.name]]);
       }
     }
     return (error) ? [] : results;
