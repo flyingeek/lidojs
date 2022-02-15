@@ -178,15 +178,15 @@ export class Ofp {
       extract = extract.split("REMARKS:", 1)[0];
       extract = extract.split("Generated at", 1)[0];
     }
+    if (extract.includes(" NOTES:")) {
+      extract = extract.split(" NOTES:", 1)[0];
+    }
     if (extract.includes(" LVLS ")) {
       // split at track letter, discard first part
       const a = extract.split(/(?:\s|[^A-Z\d])([A-Z])\s{3}/gu).slice(1);
       // results are [trackLetter, trackDescription]
       for (let i = 0, max = a.length; i < max; i += 2) {
         let trackDescription = a[i + 1];
-        if (trackDescription.includes(" NOTES:")){
-          trackDescription = trackDescription.split(" NOTES:", 1)[0];
-        }
         results.push([a[i], trackDescription]);
       }
     } else if (extract.includes('TRACKS')) {
