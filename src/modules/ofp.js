@@ -178,8 +178,12 @@ export class Ofp {
       extract = extract.split("REMARKS:", 1)[0];
       extract = extract.split("Generated at", 1)[0];
     }
-    if (extract.includes(" NOTES:")) {
-      extract = extract.split(" NOTES:", 1)[0];
+    let separator = " NOTES:";
+    //As we can have multiple TRACKNAT messages, we can not simply split on NOTES
+    if (extract.includes(separator)) {
+      const parts = extract.split(separator);
+      parts.slice(0, -1).join(separator);  // skip after _last_ NOTES:
+      extract = parts.slice(0, -1).join(separator);
     }
     if (extract.includes(" LVLS ")) {
       // split at track letter, discard first part
