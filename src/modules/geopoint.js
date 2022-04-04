@@ -184,6 +184,17 @@ class GeoPoint {
     }
 
     /**
+     * Lazy Degrees Minutes String representation
+     * @returns {null}
+     */
+    get roundeddm() {
+        if (this.dm_cache === null) {
+            this.dm_cache = this.latlng.asRoundedDM;
+        }
+        return this.dm_cache;
+    }
+
+    /**
      * Get the spherical distance beetween two GeoPoints
      * @param {GeoPoint} geopoint1
      * @param {GeoPoint} geopoint2

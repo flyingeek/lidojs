@@ -135,7 +135,7 @@ export class Ofp {
         const alternative = tryAlts([
           () => p.name.replace(/00\.0/gu,''),
           () => p.name.replace(/\.0/gu,''),
-          () => ((p.name === 'N5928.0W10155.4') ? 'N5928W10155' : null),
+          () => p.roundeddm,
         ]);
         if (alternative) {
           results.push([p, ...alternative]);

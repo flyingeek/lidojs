@@ -65,6 +65,43 @@ class LatLng {
         return format(this.latitude) + format(this.longitude, 'EW');
     }
 
+    /**
+     *Degrees Minutes representation of LatLng
+     * exemple: N09W020
+     * @returns {String}
+     */
+    get asRoundedDM() {
+        const format = function (v, letters = "NS") {
+            let value = Math.abs(v);
+            let degrees = Math.floor(value);
+            let rest = (value - degrees) * 60;
+            let minutes = Math.floor(rest);
+            let cents = Math.round((rest - minutes) * 10);
+            if (cents > 5) {
+                cents = 0;
+                minutes += 1;
+            }
+            if (minutes >= 60) {
+                minutes = 0;
+                degrees += 1;
+            }
+            let letter = "",
+                padding = 2;
+            if (letters === 'NS') {
+                letter = (v >= 0) ? letters[0] : letters[1];
+            } else {
+                letter = (v > 0) ? letters[0] : letters[1];
+                padding = 3;
+            }
+            return [
+                letter,
+                degrees.toFixed(0).padStart(padding, "0"),
+                minutes.toFixed(0).padStart(2, "0"),
+            ].join('');
+        }
+        return format(this.latitude) + format(this.longitude, 'EW');
+    }
+
     get asPhiLam() {
         const [phi, lam] = [this.latitude, this.longitude].map((d) => d * Math.PI / 180);
         return new PhiLam(phi, lam);
@@ -102,7 +139,8 @@ class PhiLam {
 //helper for python like code
 const philam2latlng = (philam) => philam.asLatLng;
 const latlng2dm = (latlng) => latlng.asDM;
+const latlng2roundeddm = (latlng) => latlng.asRoundedDM;
 
 export {
-    LatLng, PhiLam, philam2latlng, latlng2dm
+    LatLng, PhiLam, philam2latlng, latlng2dm, latlng2roundeddm
 };
