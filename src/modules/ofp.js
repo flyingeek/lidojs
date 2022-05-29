@@ -265,8 +265,8 @@ export class Ofp {
             }
           });
         let direction = "";
-        if (description.match(/RTS WEST/u)) direction = "WEST";
-        if (description.match(/RTS EAST/u)) direction = "EAST";
+        if (description.match(/RTS\s+WEST/u)) direction = "WEST";
+        if (description.match(/RTS\s+EAST/u)) direction = "EAST";
         tracks.push(new Track(trackRoute,
           {
             "name": `NAT ${letter}`,
