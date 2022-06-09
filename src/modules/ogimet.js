@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import {km_to_rad, rad_to_km} from "./geopoint";
+import {GeoPoint, km_to_rad, rad_to_km} from "./geopoint";
 import {Route} from "./route";
 
 /**
@@ -104,7 +104,13 @@ export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSiz
     let ogimetResults = [];
     const o_index = {};
     for (const p of route.split(60, {'converter': km_to_rad, 'preserve': true}).points) {
-        const [neighbour, x] = getNeighbour(p);
+        let [neighbour, x] = getNeighbour(p);
+        // force PASY for polar tokyo route
+        if (['OPAKE', 'NATES'].includes(p.name) && neighbour === null){
+          const pasy = new GeoPoint([52.71226, 174.1136], {"name": "PASY"});
+          neighbour = pasy;
+          x = pasy.distanceTo(p, null);
+        }
         if (neighbour !== null) {
             if (neighbour.name in o_index) {
                 if (o_index[neighbour.name][0] > x) {
@@ -116,7 +122,6 @@ export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSiz
             ogimetResults.push({'fpl': p, 'ogimet': neighbour});
         }
     }
-
     // eslint-disable-next-line eqeqeq
     ogimetResults = ogimetResults.filter((r) => o_index[r.ogimet.name][1] == r.fpl);
     ogimetResults = filterByXtd(ogimetResults);
