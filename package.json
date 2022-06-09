@@ -1,6 +1,6 @@
 {
   "name": "@flyingeek/lidojs",
-  "version": "1.6.36",
+  "version": "1.6.37",
   "description": "convert Lido OFP text files",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"

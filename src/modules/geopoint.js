@@ -355,7 +355,6 @@ class GeoPoint {
             let lam = lon1;
             if (Math.cos(phi) !== 0) {
                 lam = Math.asin(Math.sin(tc) * Math.sin(d) / Math.cos(phi))
-                if (lon1 - lam < - Math.PI) lam = lon1 + Math.PI; // fix PPT ETOPS circle
                 lam = fmod(lon1 - lam + Math.PI, 2 * Math.PI) - Math.PI;
             }
             return new GeoPoint(new PhiLam(phi, lam).asLatLng);
