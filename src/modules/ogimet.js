@@ -106,7 +106,7 @@ export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSiz
     for (const p of route.split(60, {'converter': km_to_rad, 'preserve': true}).points) {
         let [neighbour, x] = getNeighbour(p);
         // force PASY for polar tokyo route
-        if (['OPAKE', 'NATES'].includes(p.name) && neighbour === null){
+        if (['OPAKE', 'NATES', 'RMORE', 'PLADO', 'RAZLY', 'PINSO'].includes(p.name) && neighbour === null){
           const pasy = new GeoPoint([52.71226, 174.1136], {"name": "PASY"});
           neighbour = pasy;
           x = pasy.distanceTo(p, null);
