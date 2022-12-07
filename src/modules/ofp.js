@@ -102,7 +102,7 @@ export class Ofp {
   wptNamesEET(geoPoints) {
     const start = 'ATC DEPARTURE';
     const pattern = /[\s-]([A-Z0-9/]+)\s+[0-9]{3}\s+(?:[0-9.\s]{4})\s+\.\.\.\.\/\.\.\.\.\s(.{3})\s[A-Z0-9/.+\s-]+?[0-9]{4}\/([0-9]{4})\s+[0-9]{3}\/[0-9]{3}/gu;
-    const extract = this.text.extract(start, 'DESTINATION ALTERNATE', true);
+    const extract = this.text.extract(start, 'DESTINATION ALTERNATE', true).extract(false, '--FLIGHT LOG TO RECLEAR', true);
     const matches = extract.matchAll(pattern);
 
     const eet = {};
