@@ -127,7 +127,7 @@ async function mergeData() {
   await Promise.all([volaRequest(volaURL), wmoRequest(wmoURL)]).then(([volaData, wmoData]) => {
     const wmo = [];
     for (const [wid, name, lon, lat] of wmoData) {
-      if (wid in volaData){
+      if (wid in volaData && (['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83249', '83742'].indexOf(wid) < 0)){
         const [volaLon, volaLat, remarks] = volaData[wid];
         if (['CYMT', 'LFBV'].indexOf(name) >= 0) continue;
         if (remarks.indexOf("GOS") < 0) continue;
