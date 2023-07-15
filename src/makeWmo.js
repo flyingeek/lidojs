@@ -140,7 +140,7 @@ async function mergeData() {
       }
     }
     for (const [wid, [lon, lat, remarks]] of Object.entries(volaData)) {
-      if ((wmo.indexOf(wid) < 0) && (['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83075', '83742'].indexOf(wid) < 0) && (remarks.indexOf("GOS") >= 0)) {
+      if ((wmo.indexOf(wid) < 0) && (['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83742'].indexOf(wid) < 0) && (remarks.indexOf("GOS") >= 0)) {
         addData(wid, lat, lon);
         counter += 1;
       } else {
