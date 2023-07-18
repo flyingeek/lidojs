@@ -11,6 +11,7 @@ const wmoVarPath = "./dist/wmo.var.js";
 const wmoURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/nsd_bbsss.txt";
 const volaURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/vola_legacy_report.txt";
 //const volaURL = "https://oscar.wmo.int/oscar/vola/vola_legacy_report.txt";
+const excludedStations = ['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83249', '83581', '83742'];
 
 /**
  * Promise to vola importer
@@ -45,9 +46,10 @@ function volaRequest(url) {
           results[wid] = [
             normalize(row[9]),
             normalize(row[8]),
-            row[28].split(", ")
+            row[28]//.split(", ")
           ]
           counter += 1;
+          //console.log({wid, "data": results[wid]});
         });
         console.log(`${counter} vola stations`);
         resolve(results);
@@ -127,7 +129,7 @@ async function mergeData() {
   await Promise.all([volaRequest(volaURL), wmoRequest(wmoURL)]).then(([volaData, wmoData]) => {
     const wmo = [];
     for (const [wid, name, lon, lat] of wmoData) {
-      if (wid in volaData && (['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83249', '83581', '83742'].indexOf(wid) < 0)){
+      if (wid in volaData && (excludedStations.indexOf(wid) < 0)){
         const [volaLon, volaLat, remarks] = volaData[wid];
         if (['CYMT', 'LFBV'].indexOf(name) >= 0) continue;
         if (remarks.indexOf("GOS") < 0) continue;
@@ -140,7 +142,7 @@ async function mergeData() {
       }
     }
     for (const [wid, [lon, lat, remarks]] of Object.entries(volaData)) {
-      if ((wmo.indexOf(wid) < 0) && (['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83249','83581', '83742'].indexOf(wid) < 0) && (remarks.indexOf("GOS") >= 0)) {
+      if ((wmo.indexOf(wid) < 0) && (excludedStations.indexOf(wid) < 0) && (remarks.indexOf("GOS") >= 0)) {
         addData(wid, lat, lon);
         counter += 1;
       } else {
