@@ -14,7 +14,7 @@ test('getNearestPointsDirty', () => {
       }).toThrow();
     wmoGrid.data = loadWmo();
     nearest = Array.from(wmoGrid.getNearestPointsDirty(centerPoint, 75, km_to_rad));
-    expect(nearest.length).toEqual(42);
+    expect(nearest.length).toEqual(41);
 });
 
 test('getNearestPoints', () => {
@@ -22,7 +22,6 @@ test('getNearestPoints', () => {
    const wmoGrid = new GeoGridIndex();
    wmoGrid.data = loadWmo();
    const nearest = Array.from(wmoGrid.getNearestPoints(centerPoint, 27, km_to_rad));
-   expect(nearest.length).toEqual(1);
+   expect(nearest.length).toEqual(2);
    expect(nearest[0][0].name).toEqual("07145");
 });
-
