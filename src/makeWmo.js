@@ -11,7 +11,7 @@ const wmoVarPath = "./dist/wmo.var.js";
 const wmoURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/nsd_bbsss.txt";
 const volaURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/vola_legacy_report.txt";
 //const volaURL = "https://oscar.wmo.int/oscar/vola/vola_legacy_report.txt";
-const excludedStations = ['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83249', '83581', '83742', '40280', 'LFPC', '04418', '81003'];
+const excludedStations = ['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83249', '83581', '83742', '40280', 'LFPC', '04418', '81003', 'LIMT'];
 
 /**
  * Promise to vola importer
