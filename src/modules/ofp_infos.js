@@ -261,6 +261,7 @@ function ofpInfos(text) {
   const ofpIN = new Date(ofpON.getTime() + taxiTimeIN * 60000);
   const tzdb = {};
   let flightTypePNT = null;
+  let stopoverIATA = '';
   try {
       const pairingText = text.extract('CREW PAIRING', 'Generated');
       pattern = /DATE\s:\s(\d+)\.(\S{3})\.(\d{4})/u;
@@ -275,6 +276,7 @@ function ofpInfos(text) {
             if (duty.legs && duty.legs.length > 0) {
               const iata = duty.legs[0].depIATA;
               tzdb[iata] = iata2tz(iata);
+              stopoverIATA = iata;
             }
           }
       } else {
@@ -349,6 +351,7 @@ function ofpInfos(text) {
     inFlightReleased,
     inFlightStart,
     flightTypePNT,
+    stopoverIATA,
     tzdb
   }
   try {
