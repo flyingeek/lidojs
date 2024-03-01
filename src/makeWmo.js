@@ -13,7 +13,7 @@ const wmoURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec824
 //const volaURL = "https://oscar.wmo.int/oscar/vola/vola_legacy_report.txt";
 const volaJSONURL = "https://gist.githubusercontent.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/oscar_wmo_stations.json"
 //const volaJSONURL = "https://oscar.wmo.int/surface/rest/api/search/station?facilityType=landFixed&programAffiliation=GOSGeneral,RBON,GBON,RBSN,RBSNp,RBSNs,RBSNsp,RBSNst,RBSNt,ANTON,ANTONt&variable=216&variable=224&variable=227&variable=256&variable=310&variable=12000";
-const excludedStations = ['36874']; //['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83249', '83581', '83742', '40280', 'LFPC', '04418', '81003', 'LIMT', '84378', '04282', '11336'];
+const excludedStations = ['36874', '36894']; //['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83249', '83581', '83742', '40280', 'LFPC', '04418', '81003', 'LIMT', '84378', '04282', '11336'];
 //['71822', '72232', '71944', '83032', '83075', '83249', '83581', '83742', '40280', 'LFPC', '04418', '81003', 'LIMT', '84378', '04282', '11336']
 /**
  * Promise to oscar json importer
