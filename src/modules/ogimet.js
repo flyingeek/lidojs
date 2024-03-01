@@ -9,11 +9,11 @@ import {Route} from "./route";
  * @param {string} name the name of the returned route
  * @param {string} description the description of the returned route
  */
-export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSize=300, algorithm='xtd'} = {}) {
+export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSize=300, algorithm='xtd', excluded} = {}) {
     const neighbourRadius = (rad_to_km(wmoGrid.gridSize) / 2.0) - 0.1
-
     const getNeighbour = (point) => {
         let neighbours = [...wmoGrid.getNearestPoints(point, neighbourRadius)];
+        if (Array.isArray(excluded)) neighbours = neighbours.filter(n => excluded.indexOf(n[0].name) < 0);
         if (neighbours.length > 0) {
             neighbours = neighbours.sort((a, b) => a[1] - b[1]);
             if (neighbours.map((a) => a[0].name).indexOf(point.name) >= 0) {
@@ -140,7 +140,7 @@ export function ogimetRoute(wmoGrid, route, {name="", description="", segmentSiz
  * @param {editolido.OFP} ofp the OFP
  * @param {editolido.GeoGridIndex} wmoGrid  the loaded Grid
  */
-export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
+export function ogimetData(ofp, wmoGrid, algorithm="xtd", excluded) {
     // timestamp for departure
     const taxitime = ofp.infos['taxiTimeOUT'];
     const ts = (ofp.infos['ofpOUT'].getTime() / 1000) + (taxitime * 60);
@@ -155,7 +155,7 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd") {
     let hini = 0;
     let hfin = Math.ceil(ofp.infos.flightTime / 60);
     const fl = ofp.infos.averageFL;
-    const route = ogimetRoute(wmoGrid, ofp.route,{name, algorithm});
+    const route = ogimetRoute(wmoGrid, ofp.route,{name, algorithm, "excluded": excluded || []});
     const labels = route.points.filter(p => p.name !== "").map(p => p.name);
     route.description = labels.join(' ');
     const url = `http://www.ogimet.com/display_gramet.php?lang=en&hini=${hini}&tref=${tref}&hfin=${hfin}&fl=${fl}&hl=3000&aero=yes&wmo=${labels.join('_')}&submit=submit`;
