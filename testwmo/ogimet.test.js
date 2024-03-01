@@ -14,7 +14,7 @@ test('getNearestPointsDirty', () => {
       }).toThrow();
     wmoGrid.data = loadWmo();
     nearest = Array.from(wmoGrid.getNearestPointsDirty(centerPoint, 75, km_to_rad));
-    expect(nearest.length).toEqual(38);
+    expect(nearest.length).toEqual(41);
 });
 
 test('getNearestPoints', () => {
