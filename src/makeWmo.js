@@ -1,5 +1,6 @@
 /* eslint-disable no-sync */
 /*eslint no-continue: 0*/
+/* eslint max-lines-per-function: 0 */
 const Geohash = require('ngeohash');
 const Papa = require('papaparse');
 const fs = require('fs');
@@ -37,19 +38,22 @@ function volaJSONRequest(url) {
           const wid = w.wigosId.split('-').pop();
           if (
             wid.match(/^\d{5}$/u)
+
+            /*
             && w.stationStatusCode === 'operational'
             && w.stationAssessedStatusCode === 'operational'
-            && (w.stationProgramsDeclaredStatuses.indexOf('GOS')>=0 /* || w.stationProgramsDeclaredStatuses.indexOf('RBON:')>=0 || w.stationProgramsDeclaredStatuses.indexOf('GBON:')>=0*/)
+            && (w.stationProgramsDeclaredStatuses.indexOf('GOS')>=0)
+            */
           ) {
             results[wid] =[
               parseFloat(w.longitude),
               parseFloat(w.latitude),
-              w.stationProgramsDeclaredStatuses
+              w.stationStatusCode
             ];
             counter += 1;
           }
         });
-        console.log(`${counter} oscar wmo active stations`);
+        console.log(`${counter} oscar wmo stations`);
         resolve(results);
       });
     });
@@ -169,13 +173,17 @@ async function mergeData() {
     }
   }
 
-  await Promise.all([volaRequest(volaURL), wmoRequest(wmoURL)]).then(([volaData, wmoData]) => {
+  await Promise.all([volaRequest(volaURL), wmoRequest(wmoURL), volaJSONRequest(volaJSONURL)]).then(([volaData, wmoData, oscarData]) => {
     const wmoIds = [];
     for (const [wid, name, lon, lat] of wmoData) {
-      if (wid in volaData && (excludedStations.indexOf(wid) < 0)){
+      if (wid in volaData && (excludedStations.indexOf(wid) < 0) && (excludedStations.indexOf(name) < 0)){
         const [volaLon, volaLat, remarks] = volaData[wid];
         if (['CYMT', 'LFBV'].indexOf(name) >= 0) continue;
         if (remarks.indexOf("GOS") < 0) continue;
+        if (oscarData[wid] && oscarData[wid][2] !== 'operational') {
+          // console.log(`${wid} is ${oscarData[wid][2]}, skipping`);
+          continue;
+        }
         if (Math.abs(volaLon - lon) > 0.1 || Math.abs(volaLat - lat) > 0.1) {
           continue;
         }
@@ -186,6 +194,10 @@ async function mergeData() {
     }
     for (const [wid, [lon, lat, remarks]] of Object.entries(volaData)) {
       if ((wmoIds.indexOf(wid) < 0) && (excludedStations.indexOf(wid) < 0) && (remarks.indexOf("GOS") >= 0)) {
+        if (oscarData[wid] && oscarData[wid][2] !== 'operational') {
+          // console.log(`${wid} is ${oscarData[wid][2]}, skipping`);
+          continue;
+        }
         addData(wid, lat, lon);
         counter += 1;
       }
