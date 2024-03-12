@@ -17,5 +17,5 @@ test('ogimetRoute', () => {
                 .filter(p => p.name !== "")
                 .map(p => p.name)
                 .join(' ');
-  expect(names).toEqual("LFPG LFPB 07002 03559 03354 EGNH 03916 03980 71513 71634 KNHZ KPVD 72501 72505 KJFK");
+  expect(names).toEqual("LFPG LFPB 07002 03680 03560 03354 EGNH 03916 CWXW CYNA CWRZ KPWM KBOS KPVD KJFK");
 });

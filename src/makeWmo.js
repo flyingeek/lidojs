@@ -6,6 +6,7 @@ const Papa = require('papaparse');
 const fs = require('fs');
 const path = require('path');
 const {https} = require('follow-redirects');
+const ogimetIds = require('./ogimet_idx.json');
 
 const wmoPath = "./dist/wmo.json";
 const wmoVarPath = "./dist/wmo.var.js";
@@ -14,8 +15,12 @@ const volaURL = "https://gist.github.com/flyingeek/54caad59410a1f4641d480473ec82
 //const volaURL = "https://oscar.wmo.int/oscar/vola/vola_legacy_report.txt";
 const volaJSONURL = "https://gist.githubusercontent.com/flyingeek/54caad59410a1f4641d480473ec824c3/raw/oscar_wmo_stations.json"
 //const volaJSONURL = "https://oscar.wmo.int/surface/rest/api/search/station?facilityType=landFixed&programAffiliation=GOSGeneral,RBON,GBON,RBSN,RBSNp,RBSNs,RBSNsp,RBSNst,RBSNt,ANTON,ANTONt&variable=216&variable=224&variable=227&variable=256&variable=310&variable=12000";
-const excludedStations = ['71822', '41298', '72232', '41284', '71944', '41248', '41274', '71872', '83032', '83075', '83249', '83581', '83742', '40280', 'LFPC', '04418', '81003', 'LIMT', '84378', '04282', '11336'];
-//['71822', '72232', '71944', '83032', '83075', '83249', '83581', '83742', '40280', 'LFPC', '04418', '81003', 'LIMT', '84378', '04282', '11336']
+const excludedStations = [];
+
+console.log(`${excludedStations.length} excluded stations`);
+console.log(`${ogimetIds.length} ogimet stations`);
+console.log(`consider updating ogimet stations with npm run updateogimet`);
+
 /**
  * Promise to oscar json importer
  */
@@ -34,26 +39,26 @@ function volaJSONRequest(url) {
         wmo = JSON.parse(data).stationSearchResults;
         const results = {};
         let counter = 0;
+        let knownByOgimetCounter = 0;
         wmo.forEach(w => {
           const wid = w.wigosId.split('-').pop();
           if (
             wid.match(/^\d{5}$/u)
-
-            /*
-            && w.stationStatusCode === 'operational'
-            && w.stationAssessedStatusCode === 'operational'
-            && (w.stationProgramsDeclaredStatuses.indexOf('GOS')>=0)
-            */
+            && w.wigosId.startsWith('0-20000-0-')
           ) {
-            results[wid] =[
-              parseFloat(w.longitude),
-              parseFloat(w.latitude),
-              w.stationStatusCode
-            ];
             counter += 1;
+            if (ogimetIds.indexOf(wid) >= 0) {
+              knownByOgimetCounter += 1;
+              if (results[wid]) console.log(`doublon pour ${wid}`);
+              results[wid] =[
+                parseFloat(w.longitude),
+                parseFloat(w.latitude),
+                w.stationStatusCode
+              ];
+            }
           }
         });
-        console.log(`${counter} oscar wmo stations`);
+        console.log(`${counter} oscar wmo stations / ${knownByOgimetCounter} known by ogimet`);
         resolve(results);
       });
     });
@@ -85,20 +90,28 @@ function volaRequest(url) {
           return sign * (degrees + (minutes / 60) + (seconds / 3600));
         };
         let counter = 0;
+        let knownByOgimetCounter = 0;
         parsed.data.slice(1).forEach((row) => {
           if (row.length < 28) return;
           const wid = row[5];
-          if (!wid) return;
-          // wid: [lon, lat, remarks]
-          results[wid] = [
-            normalize(row[9]),
-            normalize(row[8]),
-            row[28]//.split(", ")
-          ]
-          counter += 1;
-          //console.log({wid, "data": results[wid]});
+          if (wid && wid.match(/^\d{5}$/u) && row[6] === "0") {
+            if (results[wid]) {
+              if (wid !== "94907") console.log(`doublon pour ${wid}`); //known doubles
+            } else {
+              counter += 1;
+              if (ogimetIds.indexOf(wid) >= 0) {
+                knownByOgimetCounter += 1;
+                // wid: [lon, lat, remarks]
+                results[wid] = [
+                  normalize(row[9]),
+                  normalize(row[8]),
+                  row[28]//.split(", ")
+                ]
+              }
+            }
+          }
         });
-        console.log(`${counter} vola stations`);
+        console.log(`${counter} vola stations / ${knownByOgimetCounter} known by ogimet`);
         resolve(results);
       })
     });
@@ -130,18 +143,23 @@ function wmoRequest(url) {
           return sign * (degrees + (minutes / 60) + (seconds / 3600));
         };
         let counter = 0;
+        let knownByOgimetCounter = 0;
         parsed.data.forEach((row) => {
           if (row.length < 8) return;
+          const wid = row[0] + row[1];
           // wid, name, lon, lat
-          results.push([
-            row[0] + row[1],
-            (row[2] === '----') ? row[0] + row[1] : row[2],
-            normalize(row[8]),
-            normalize(row[7])
-          ]);
           counter += 1;
+          if (ogimetIds.indexOf(wid) >= 0) {
+            knownByOgimetCounter += 1;
+            results.push([
+              wid,
+              (row[2] === '----') ? row[0] + row[1] : row[2],
+              normalize(row[8]),
+              normalize(row[7])
+            ]);
+          }
         });
-        console.log(`${counter} wmo stations`);
+        console.log(`${counter} wmo stations / ${knownByOgimetCounter} known by ogimet`);
         resolve(results);
       })
     });
@@ -171,37 +189,29 @@ async function mergeData() {
     } else {
         data[geohash] = [value];
     }
+    counter += 1;
   }
 
   await Promise.all([volaRequest(volaURL), wmoRequest(wmoURL), volaJSONRequest(volaJSONURL)]).then(([volaData, wmoData, oscarData]) => {
-    const wmoIds = [];
+    const addedWmoIds = [];
     for (const [wid, name, lon, lat] of wmoData) {
-      if (wid in volaData && (excludedStations.indexOf(wid) < 0) && (excludedStations.indexOf(name) < 0)){
-        const [volaLon, volaLat, remarks] = volaData[wid];
-        if (['CYMT', 'LFBV'].indexOf(name) >= 0) continue;
-        if (remarks.indexOf("GOS") < 0) continue;
-        if (oscarData[wid] && oscarData[wid][2] !== 'operational') {
-          // console.log(`${wid} is ${oscarData[wid][2]}, skipping`);
-          continue;
-        }
-        if (Math.abs(volaLon - lon) > 0.1 || Math.abs(volaLat - lat) > 0.1) {
-          continue;
-        }
-        wmoIds.push(wid);
+        if ((excludedStations.indexOf(wid) >= 0) || (excludedStations.indexOf(name) >= 0)) continue;
+        addedWmoIds.push(wid);
         addData(name, lat, lon);
-        counter += 1;
-      }
     }
-    for (const [wid, [lon, lat, remarks]] of Object.entries(volaData)) {
-      if ((wmoIds.indexOf(wid) < 0) && (excludedStations.indexOf(wid) < 0) && (remarks.indexOf("GOS") >= 0)) {
-        if (oscarData[wid] && oscarData[wid][2] !== 'operational') {
-          // console.log(`${wid} is ${oscarData[wid][2]}, skipping`);
-          continue;
-        }
-        addData(wid, lat, lon);
-        counter += 1;
-      }
+    console.log(`wmo stations processed, total: ${counter} WMO stations`);
+    for (const [wid, [lon, lat, ]] of Object.entries(volaData)) {
+      if (excludedStations.indexOf(wid) >= 0 || addedWmoIds.indexOf(wid) >= 0) continue;
+      addedWmoIds.push(wid);
+      addData(wid, lat, lon);
     }
+    console.log(`vola stations processed, total: ${counter} WMO stations`);
+    for (const [wid, [lon, lat, ]] of Object.entries(oscarData)) {
+      if (excludedStations.indexOf(wid) >= 0 || addedWmoIds.indexOf(wid) >= 0) continue;
+      addedWmoIds.push(wid);
+      addData(wid, lat, lon);
+    }
+    console.log(`oscar stations processed, total: ${counter} WMO stations`);
   })
   return data;
 }

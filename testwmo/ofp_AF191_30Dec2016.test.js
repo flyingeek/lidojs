@@ -17,11 +17,11 @@ test('ogimetRoute', () => {
                 .filter(p => p.name !== "")
                 .map(p => p.name)
                 .join(' ');
-  expect(names).toEqual("43296 43264 43161 43158 OIKB 40851 40821 OIIK OITZ OITT 17024 15561 15499 15460 15182 11880 11628 11406 10605 06484 LFPG");
+  expect(names).toEqual("43296 43272 VOBI 43161 43158 OIKB 40851 OIYY OIII OITZ OITT LTCE 17024 15460 15230 11880 LKTB 11406 EDDF EDFH LFPG");
 });
 
 test('ogimetData', () => {
   const data = ogimetData(ofp, wmoGrid);
-  expect(data.wmo.join(' ')).toEqual("43296 43264 43161 43158 OIKB 40851 40821 OIIK OITZ OITT 17024 15561 15499 15460 15182 11880 11628 11406 10605 06484 LFPG");
+  expect(data.wmo.join(' ')).toEqual("43296 43272 VOBI 43161 43158 OIKB 40851 OIYY OIII OITZ OITT LTCE 17024 15460 15230 11880 LKTB 11406 EDDF EDFH LFPG");
   expect(data.url.length).toBeGreaterThan(10);
 });
