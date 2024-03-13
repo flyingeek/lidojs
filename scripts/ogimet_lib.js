@@ -22,7 +22,7 @@ function ogimet12HoursIndexSet(hours) {
     const stationSet = new Set();
     const parsed = Papa.parse(data);
     parsed.data.slice(1).forEach((row) => {
-      if (row[0].match(/^\d{5}$/u)) {
+      if (row[0].match(/^\d{5}$/u) && !row[6].endsWith('NIL=')) {
         stationSet.add(row[0]);
       }
     });
