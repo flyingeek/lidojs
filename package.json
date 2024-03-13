@@ -1,6 +1,6 @@
 {
   "name": "@flyingeek/lidojs",
-  "version": "1.6.67",
+  "version": "1.6.68",
   "description": "convert Lido OFP text files",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
@@ -19,9 +19,10 @@
     "coverage": "jest --collectCoverageFrom=src/**.js --coverage src",
     "build": "webpack",
     "build_with_wmo": "webpack && node src/makeWmo.js",
-    "makefish": "node src/makeFish.js",
-    "makewmo": "node src/makeWmo.js",
-    "updateogimet": "node src/updateOgimetIdx.js",
+    "makefish": "node scripts/makeFish.js",
+    "makewmo": "node scripts/makeWmo.js",
+    "diffogimet": "node scripts/diffOgimetIdx.js",
+    "updateogimet": "node scripts/updateOgimetIdx.js",
     "release": "npm version patch && webpack"
   },
   "browserslist": [

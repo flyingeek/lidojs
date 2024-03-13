@@ -9,8 +9,8 @@ export const loadDataAsString = function(filename) {
 };
 
 export const loadWmo = function() {
-  const dataPath = path.resolve(__dirname, '../dist');
+  const dataPath = path.resolve(__dirname, '../test');
   // eslint-disable-next-line no-sync
-  const data = fs.readFileSync(path.resolve(dataPath, "wmo.json"), 'utf8');
+  const data = fs.readFileSync(path.resolve(dataPath, "wmo_for_test.json"), 'utf8');
   return JSON.parse(data)
 }
