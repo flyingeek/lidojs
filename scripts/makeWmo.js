@@ -1,4 +1,5 @@
-const fs = require('fs/promises');
+/* eslint-disable no-sync */
+const fs = require('fs');
 const path = require('path');
 const Geohash = require('ngeohash');
 const {wmoParser} = require('./wmo_parsers');
@@ -37,8 +38,8 @@ function geoEncode(data, precision=3) {
   return results;
 }
 
-wmoParser(ogimetIds, excludedStations).then(async data => {
-  await fs.mkdir(path.dirname(wmoPath), {'recursive': true});
+wmoParser(ogimetIds, excludedStations).then(data => {
+  fs.mkdirSync(path.dirname(wmoPath), {'recursive': true});
   const geohashedData = geoEncode(data);
   fs.writeFile(wmoPath, JSON.stringify(geohashedData), (err) => {
     if (err) {
