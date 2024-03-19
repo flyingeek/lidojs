@@ -4,7 +4,9 @@ const previousOgimetIds = require('./ogimet_idx.json');
 
 const outputPath = "./scripts/ogimet_idx.json";
 
-ogimetIndexSet().then(stationSet => {
+// We fetch the SYNOPS on a 36 hours period, those index SHOULD be recognized by Ogimet (but not really...)
+
+ogimetIndexSet(true).then(stationSet => {
   const difference = (setA, setB) => {
       let diff = new Set(setA);
       for (let elem of setB) {

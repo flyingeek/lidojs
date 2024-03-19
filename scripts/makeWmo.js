@@ -4,7 +4,9 @@ const path = require('path');
 const Geohash = require('ngeohash');
 const {wmoParser} = require('./wmo_parsers');
 
-/* Our current list of Ogimet's known WMO index */
+/* Our current list of Ogimet's known WMO index
+  This is not exactly true so we also have to perform cross check, see ogimet_lib
+*/
 const ogimetIds = require('./ogimet_idx.json');
 
 /* If needed we can exlude stations by their ID (like 74038) or their name (like LIMT) */

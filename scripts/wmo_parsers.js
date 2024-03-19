@@ -63,41 +63,41 @@ function wmoRequest(ogimetIds, url=`${gistURL}/raw/nsd_bbsss.txt`) {
  *
  * @returns {Promise<Array>} [{wid<string>, name?<string>, longitude<float>, latitude<float>}]
  */
-function volaRequest(ogimetIds, url=`${gistURL}/raw/vola_legacy_report.txt`) {
-  return parserPromise(url, data => {
-    const parsed = Papa.parse(data);
-    const results = [];
-    const wids = [];
-    const normalize = (v) => {
-      const orientation = v.slice(-1);
-      const sign = ('SW'.indexOf(orientation) >= 0) ? -1 : 1;
-      let coords = ('NEWS'.indexOf(orientation) >=0) ? v.slice(0, -1) : v;
-      coords += ' 0 0'  // ensure missing seconds or minutes are 0
-      const [degrees, minutes, seconds] = coords.split(' ', 3).map(parseFloat);
-      return sign * (degrees + (minutes / 60) + (seconds / 3600));
-    };
-    parsed.data.slice(1).forEach((row) => {
-      if (row.length < 28) return;
-      const wid = row[5];
-      if (wid && wid.match(/^\d{5}$/u) && row[6] === "0") { /* some stations have subindex (1, 2...) defined in row[6] */
-        if (wid !== "94907" && wids.indexOf(wid) >= 0) { // 94907 has a knwon duplicate
-          console.log(`duplicate for ${wid}`);
-        } else {
-          wids.push(wid);
-          if (ogimetIds.indexOf(wid) >= 0) {
-            results.push({
-              wid,
-              "longitude": normalize(row[9]),
-              "latitude": normalize(row[8])
-            });
-          }
-        }
-      }
-    });
-    console.log(`${wids.length} vola stations / ${results.length} known by ogimet`);
-    return results;
-  });
-}
+// function volaRequest(ogimetIds, url=`${gistURL}/raw/vola_legacy_report.txt`) {
+//   return parserPromise(url, data => {
+//     const parsed = Papa.parse(data);
+//     const results = [];
+//     const wids = [];
+//     const normalize = (v) => {
+//       const orientation = v.slice(-1);
+//       const sign = ('SW'.indexOf(orientation) >= 0) ? -1 : 1;
+//       let coords = ('NEWS'.indexOf(orientation) >=0) ? v.slice(0, -1) : v;
+//       coords += ' 0 0'  // ensure missing seconds or minutes are 0
+//       const [degrees, minutes, seconds] = coords.split(' ', 3).map(parseFloat);
+//       return sign * (degrees + (minutes / 60) + (seconds / 3600));
+//     };
+//     parsed.data.slice(1).forEach((row) => {
+//       if (row.length < 28) return;
+//       const wid = row[5];
+//       if (wid && wid.match(/^\d{5}$/u) && row[6] === "0") { /* some stations have subindex (1, 2...) defined in row[6] */
+//         if (wid !== "94907" && wids.indexOf(wid) >= 0) { // 94907 has a knwon duplicate
+//           console.log(`duplicate for ${wid}`);
+//         } else {
+//           wids.push(wid);
+//           if (ogimetIds.indexOf(wid) >= 0) {
+//             results.push({
+//               wid,
+//               "longitude": normalize(row[9]),
+//               "latitude": normalize(row[8])
+//             });
+//           }
+//         }
+//       }
+//     });
+//     console.log(`${wids.length} vola stations / ${results.length} known by ogimet`);
+//     return results;
+//   });
+// }
 
 /**
  * Promise to oscar json importer
@@ -144,22 +144,34 @@ function oscarRequest(ogimetIds, url=`${gistURL}/raw/oscar_wmo_stations.json`) {
 async function wmoParser(ogimetIds, excludedStations) {
   const data = [];
 
-  await Promise.all([volaRequest(ogimetIds), wmoRequest(ogimetIds), oscarRequest(ogimetIds)]).then(([volaData, wmoData, oscarData]) => {
+  await Promise.all([wmoRequest(ogimetIds), oscarRequest(ogimetIds)]).then(([wmoData, oscarData]) => {
     const addedWmoIds = [];
-    for (const {wid, name, longitude, latitude} of wmoData) {
-        if ((excludedStations.indexOf(wid) < 0) && (excludedStations.indexOf(name) < 0)) {
-          addedWmoIds.push(wid);
-          data.push([name || wid, latitude, longitude]);
-        }
+    const oscarByWids = {};
+    for (const {wid, longitude, latitude} of oscarData) {
+      oscarByWids[wid] = {longitude, latitude};
     }
-    console.log(`wmo stations processed, total: ${data.length} WMO stations`);
-    for (const {wid, longitude, latitude} of volaData) {
-      if (excludedStations.indexOf(wid) < 0 && addedWmoIds.indexOf(wid) < 0) {
-        addedWmoIds.push(wid);
-        data.push([wid, latitude, longitude]);
+
+    for (const {wid, name, longitude, latitude} of wmoData) {
+      //wmoData is an old file used to keep track of ICAO codes for WMO
+      //since the ogimetId db is not accurate we have to perform extra check with the oscar DB
+      //we have to make sure data is also in oscar DB and that longitude/latitude match
+      if ((excludedStations.indexOf(wid) < 0) && (excludedStations.indexOf(name) < 0) && wid in oscarByWids) {
+        const diffLat = Math.abs(oscarByWids[wid].latitude - latitude );
+        const diffLon = Math.abs(oscarByWids[wid].longitude - longitude );
+        if (diffLat < 0.15 && diffLon < 0.15) {
+          addedWmoIds.push(wid);
+          if (name === 'LFBV') {
+            data.push([wid, latitude, longitude]); //LFBV not recognized by Ogimet but 74038 is
+          } else {
+            data.push([name || wid, latitude, longitude]);
+          }
+        } else {
+          //console.log(`rejecting lat/lon for ${wid}/${name} (lon:${diffLon} lat:${diffLat})`);
+        }
       }
     }
-    console.log(`vola stations processed, total: ${data.length} WMO stations`);
+    console.log(`wmo stations processed, total: ${data.length} WMO stations`);
+
     for (const {wid, longitude, latitude} of oscarData) {
       if (excludedStations.indexOf(wid) < 0 && addedWmoIds.indexOf(wid) < 0) {
         addedWmoIds.push(wid);
