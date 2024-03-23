@@ -6,3 +6,4 @@ dist/
 
 src/modules/wmo.json
 src/scratchpad.js
+scripts/debug_*

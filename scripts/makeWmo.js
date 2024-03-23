@@ -2,12 +2,13 @@
 const fs = require('fs');
 const path = require('path');
 const Geohash = require('ngeohash');
-const {wmoParser} = require('./wmo_parsers');
+//const {wmoParser} = require('./wmo_parsers');
 
 /* Our current list of Ogimet's known WMO index
   This is not exactly true so we also have to perform cross check, see ogimet_lib
 */
-const ogimetIds = require('./ogimet_idx.json');
+// const ogimetIds = require('./ogimet_idx.json');
+const ogimetScrapy = require('./ogimet.json');
 
 /* If needed we can exlude stations by their ID (like 74038) or their name (like LIMT) */
 const excludedStations = [];
@@ -17,8 +18,8 @@ const wmoVarPath = "./dist/wmo.var.js";
 const wmoPath = "./dist/wmo.json";
 
 console.log(`${excludedStations.length} excluded stations`);
-console.log(`${ogimetIds.length} ogimet stations`);
-console.log(`consider updating ogimet stations with npm run updateogimet`);
+console.log(`${ogimetScrapy.length} ogimet stations`);
+console.log(`consider updating ogimet stations with scrapy-ogimet`);
 
 /**
  * geoEncode
@@ -40,20 +41,40 @@ function geoEncode(data, precision=3) {
   return results;
 }
 
-wmoParser(ogimetIds, excludedStations).then(data => {
-  fs.mkdirSync(path.dirname(wmoPath), {'recursive': true});
-  const geohashedData = geoEncode(data);
-  fs.writeFile(wmoPath, JSON.stringify(geohashedData), (err) => {
-    if (err) {
-      throw err;
-    } else {
-      console.log(`Saved ${data.length} stations!`);
-    }
-  });
-  // according to Google engineers, JSON.parse is faster than the native js parsing
-  fs.writeFile(wmoVarPath, `var WMO=JSON.parse('${JSON.stringify(geohashedData)}');\n`, (err) => {
-    if (err) {
-      throw err;
-    }
-  });
+const data = ogimetScrapy.map(o => [
+  (o.icao && o.icao !== '----') ? o.icao : o.wid,
+  o.latitude,
+  o.longitude,
+]);
+const geohashedData = geoEncode(data);
+fs.mkdirSync(path.dirname(wmoPath), {'recursive': true});
+fs.writeFile(wmoPath, JSON.stringify(geohashedData), (err) => {
+  if (err) {
+    throw err;
+  } else {
+    console.log(`Saved ${data.length} stations!`);
+  }
 });
+fs.writeFile(wmoVarPath, `var WMO=JSON.parse('${JSON.stringify(geohashedData)}');\n`, (err) => {
+  if (err) {
+    throw err;
+  }
+});
+
+// wmoParser(ogimetIds, excludedStations).then(data => {
+//   fs.mkdirSync(path.dirname(wmoPath), {'recursive': true});
+//   const geohashedData = geoEncode(data);
+//   fs.writeFile(wmoPath, JSON.stringify(geohashedData), (err) => {
+//     if (err) {
+//       throw err;
+//     } else {
+//       console.log(`Saved ${data.length} stations!`);
+//     }
+//   });
+//   // according to Google engineers, JSON.parse is faster than the native js parsing
+//   fs.writeFile(wmoVarPath, `var WMO=JSON.parse('${JSON.stringify(geohashedData)}');\n`, (err) => {
+//     if (err) {
+//       throw err;
+//     }
+//   });
+// });
