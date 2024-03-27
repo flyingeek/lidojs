@@ -41,8 +41,8 @@ function geoEncode(data, precision=3) {
   return results;
 }
 
-const data = ogimetScrapy.map(o => [
-  (o.icao && o.icao !== '----') ? o.icao : o.wid,
+const data = ogimetScrapy.filter(o => o.wid && o.wigos).map(o => [
+  (o.icao) ? o.icao : o.wid,
   o.latitude,
   o.longitude,
 ]);
