@@ -69,6 +69,8 @@ test("arinc_normalizer", () => {
   expect(arinc_normalizer('5W520')).toEqual(new LatLng(-55.5, -120));
   expect(arinc_normalizer('5530N020W')).toEqual(new LatLng(55.5, -20));
   expect(arinc_normalizer('5530N02000W')).toEqual(new LatLng(55.5, -20));
+  expect(arinc_normalizer('H5040')).toEqual(new LatLng(50.5, -40));
+  expect(arinc_normalizer('H6190')).toEqual(new LatLng(61.5, -90));
   expect(() => {
     arinc_normalizer('5U520');
   }).toThrow();

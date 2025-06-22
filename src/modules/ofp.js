@@ -41,8 +41,18 @@ export class Ofp {
       }
       throw error;
     }
+
     this.removePageFooterRegex = new RegExp(String.raw`([\s-]\d{1,2})?Page\s[0-9]+\s.+?Page\s[0-9]+.+?\/${this.infos['depICAO']}-${this.infos['destICAO']}`, 'gsu');
     this.text = text.replace(this.removePageFooterRegex,'');
+    //This is not needed as of 22Jun2025
+    //Page 7 ofGenerated at 20Jun/1101z143
+    //AF 279 RJTT/LFPG 20Jun2025/1250zReleased: 20Jun/1101z3Main OFP (Long copy #1)OFP 46/0/1Jun 20 2025 10:53Page 4AFR/279/RJTT-LFPG
+    //this.removePageFooterRegex2 = new RegExp(String.raw`Page\s+\d+\s+of\sGenerated.*?\/${this.infos['depICAO']}-${this.infos['destICAO']}`, 'gmsu');
+    //this.text = this.text.replace(this.removePageFooterRegex2,'');
+    const additionalOfpStart = text.indexOf("ADDITIONAL OFP");
+    if (additionalOfpStart >= 0) {
+      this.text = this.text.substring(0, additionalOfpStart);
+    }
     this.cache = function (name, fn) {
       if (this.cacheStore === undefined) {
         this.cacheStore = {}; /* on first run create cache storage */

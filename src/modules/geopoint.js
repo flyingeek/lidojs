@@ -31,8 +31,8 @@ function dm2decimal(s) {
     // :param s: str
     const letter = s[0];
     if ('NSEW'.indexOf(letter) < 0) throw new Error("invalid letter coordinates: " + s);
-    const sign = (letter === 'N' || letter === 'E') ? 1 : -1;
-    const offset = (letter === 'N' || letter === 'S') ? 3 : 4;
+    const sign = (letter === 'N' || letter === 'H' || letter === 'E') ? 1 : -1;
+    const offset = (letter === 'N' || letter === 'H' ||letter === 'S') ? 3 : 4;
     const degrees = parseInt(s.slice(1, offset), 10);
     const minutes = parseFloat(s.slice(offset));
     return (sign * (degrees + minutes / 60))
@@ -68,7 +68,7 @@ function dm_normalizer(mixedValue) {
     }
     return new LatLng(dm2decimal(lat), dm2decimal(lng))
 }
-const arincRegex = /^([NESW]\d{4}|\d[NESW]\d{3}|\d{4}[NS]\d{3,5}[EW]|\d{2}[NS]\d{3}[EW])$/u;
+const arincRegex = /^([NESWH]\d{4}|\d[NESW]\d{3}|\d{4}[NS]\d{3,5}[EW]|\d{2}[NS]\d{3}[EW])$/u;
 const isARINC = (label) => label.match(arincRegex);
 
 /**
@@ -80,6 +80,8 @@ function arinc_normalizer(label) {
     const signed = function (letter, lat, lng) {
         switch (letter) {
             case 'N': // NW + -
+              return new LatLng(lat, -lng);
+            case 'H':
                 return new LatLng(lat, -lng);
             case 'E': // NE + +
                 return new LatLng(lat, lng);
@@ -93,7 +95,7 @@ function arinc_normalizer(label) {
     };
     let lat = 0,
         lng = 0;
-    if ('NESW'.indexOf(label[0]) >= 0) {
+    if ('HNESW'.indexOf(label[0]) >= 0) {
         // N5520  lon<100
         lat = parseInt(label.slice(1,3), 10) + 0.5;
         lng = parseInt(label.slice(3, 5), 10);
