@@ -109,53 +109,69 @@ export class Ofp {
     return reverse(extract).matchAll(wptRegExp);
   }
 
-  wptNamesEET(geoPoints) {
+  wptNamesEET(geoPoints, debug=false) {
     const start = 'ATC DEPARTURE';
     const pattern = /[\s-]([A-Z0-9/]+)\s+[0-9]{3}\s+(?:[0-9.\s]{4})\s+\.\.\.\.\/\.\.\.\.\s(.{3})\s[A-Z0-9/.+\s-]+?[0-9]{4}\/([0-9]{4})\s+[0-9]{3}\/[0-9]{3}/gu;
     const extract = this.text.extract(start, 'DESTINATION ALTERNATE', true).extract(false, '--FLIGHT LOG TO RECLEAR', true);
     const matches = extract.matchAll(pattern);
-
     const eet = {};
     let previousEET = 0;
     // eslint-disable-next-line init-declarations
     let previousFL = this.infos.levels[0];
     for (let [,name, level, t,] of matches) {
-      //console.log(name)
       if (name.startsWith('/')) name = name.slice(1); // ofp AF082
       const fl = parseInt(level, 10);
       if (!isNaN(fl)) previousFL = fl;
-      eet[name.split('/')[0]] = [previousEET, previousFL];
-      previousEET = (parseFloat(t.slice(0,2)) * 60) + parseFloat(t.slice(2))
+      let key = name.split('/')[0];
+      if (key in eet) {
+        let i = 1;
+        do {
+          i += 1;
+        } while (`${key}_${i}` in eet);
+        key = `${key}_${i}`;
+      }
+      eet[key] = [previousEET, previousFL];
+      if (debug) console.log(name, t, fl, '/', key, previousEET, previousFL);
+      previousEET = (parseFloat(t.slice(0,2)) * 60) + parseFloat(t.slice(2));
     }
     eet[this.infos['destICAO']] = [previousEET, previousFL];
-    //console.log(eet);
     const results = [];
     let error = false;
-    const tryAlts = (altnames) => {
+    const tryAlts = (pointName, point, altnames) => {
       for (const altFn of altnames) {
-        const altname = altFn();
+        const altname = altFn(pointName, point);
         if (altname !== null && eet[altname] !== undefined) {
           return eet[altname];
         }
       }
       return undefined;
     }
+    const uniqueNames = [];
     for (const p of geoPoints) {
-      if (eet[p.name] === undefined) {
-        const alternative = tryAlts([
-          () => p.name.replace(/00\.0/gu,''),
-          () => p.name.replace(/\.0/gu,''),
-          () => p.roundeddm,
+      let uniqueName = p.name;
+      if (uniqueNames.includes(uniqueName)){
+        let i = 1;
+        do {
+          i += 1;
+        } while (uniqueNames.includes(`p.name_${i}`))
+        uniqueName = p.name + `_${i}`;
+      }
+      uniqueNames.push(uniqueName);
+      if (eet[uniqueName] === undefined) {
+        const alternative = tryAlts(uniqueName, p, [
+          (name) => name.replace(/00\.0/gu,''),
+          (name) => name.replace(/\.0/gu,''),
+          (name, point) => point.roundeddm,
         ]);
         if (alternative) {
           results.push([p, ...alternative]);
         } else {
-          console.log('missing point', p.name);
+          console.log('missing point', uniqueName);
           error = true;
           break;
         }
       } else {
-          results.push([p, ...eet[p.name]]);
+          results.push([p, ...eet[uniqueName]]);
       }
     }
     return (error) ? [] : results;
