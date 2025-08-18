@@ -38,7 +38,7 @@ export const parseDuties = (pairingText, year, month) => {
     const duties = [];
     let duty = {"legs": []};
     let previousIN = null;
-    const pattern = /(\d{2})\/(\d{2})\s\S+(\sX)?\s(\S{3})\s>\s(\S{3})\s\(([-+\dh]+)\)\s(\d{2}):(\d{2})\s(?:\d{2}:\d{2})\s(\d{2}):(\d{2})/gu;
+    const pattern = /(\d{2})\/(\d{2})\s?\S+(\sX)?\s?(\S{3})\s?>\s?(\S{3})\s?\(([-+\dh]+)\)\s?(\d{2}):(\d{2})\s?(?:\d{2}:\d{2})\s?(\d{2}):(\d{2})/gu;
     for (const match of pairingText.matchAll(pattern)) {
         const m = parseInt(match[2], 10); // 1-12
         const d = parseInt(match[1], 10);

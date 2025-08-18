@@ -54,6 +54,7 @@ function ofpInfos(text) {
   }
   let {flight, depICAO, destICAO, datetime, ofp} = match.groups;
   // datetime is like 27Sep2019/1450
+  ofp=ofp.replace('CREW', ''); //pour Export PDF depuis PM
   const [ofpTextDate] = datetime.split('/', 1);
   const day = parseInt(datetime.substring(0,2), 10);
   const month = months3.indexOf(datetime.substring(2,5));
