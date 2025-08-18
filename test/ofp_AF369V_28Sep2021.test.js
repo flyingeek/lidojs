@@ -43,7 +43,7 @@ test("infos", () => {
   });
 
 test('wptNamesEET', () => {
+  let points = ofp.route.points;
   const results = ofp.wptNamesEET(ofp.wptCoordinates());
-  expect(results.length === 0).toBeFalsy();
+  expect(results.length).toEqual(points.length);
 });
-

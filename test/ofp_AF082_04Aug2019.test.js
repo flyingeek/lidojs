@@ -38,6 +38,7 @@ test("infos", () => {
     expect(infos.flightTypeAircraft).toEqual('LC');
   });
   test('wptNamesEET', () => {
-    const results = ofp.wptNamesEET(ofp.wptCoordinates());
-    expect(results.length === 0).toBeFalsy();
+  let points = ofp.route.points;
+  const results = ofp.wptNamesEET(ofp.wptCoordinates());
+  expect(results.length).toEqual(points.length);
   });

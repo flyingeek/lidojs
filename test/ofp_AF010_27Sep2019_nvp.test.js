@@ -114,6 +114,7 @@ test("ogimet route name", () => {
   expect(data.proxy).toEqual('0-1569597240-8-350-');
 });
 test('wptNamesEET', () => {
+  let points = ofp.route.points;
   const results = ofp.wptNamesEET(ofp.wptCoordinates());
-  expect(results.length === 0).toBeFalsy();
+  expect(results.length).toEqual(points.length);
 });

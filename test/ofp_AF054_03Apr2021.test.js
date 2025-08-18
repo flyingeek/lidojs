@@ -51,8 +51,9 @@ test("wptCoordinates", () => {
 });
 
 test('wptNamesEET', () => {
-    const results = ofp.wptNamesEET(ofp.wptCoordinates());
-    expect(results.length === 0).toBeFalsy();
+  let points = ofp.route.points;
+  const results = ofp.wptNamesEET(ofp.wptCoordinates());
+  expect(results.length).toEqual(points.length);
 });
 
 
