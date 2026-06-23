@@ -145,8 +145,14 @@ export function ogimetData(ofp, wmoGrid, algorithm="xtd", excluded) {
     const taxitime = ofp.infos['taxiTimeOUT'];
     const ts = (ofp.infos['ofpOUT'].getTime() / 1000) + (taxitime * 60);
     const now_ts = (new Date()).getTime() / 1000;
-    const tref = Math.round(Math.max(ts, now_ts)); //for old ofp timeref=now
     const trefOfp = new Date(Math.round(ts) * 1000);
+    const nowOfp = new Date(Math.round(now_ts) * 1000);
+    const tref = Math.round(
+        Date.UTC(trefOfp.getUTCFullYear(), trefOfp.getUTCMonth(), trefOfp.getUTCDate())
+        < Date.UTC(nowOfp.getUTCFullYear(), nowOfp.getUTCMonth(), nowOfp.getUTCDate())
+            ? now_ts
+            : ts
+    );
     // const dateref = new Date(tref * 1000); //for caching we use the ofp time instead
     // https://stackoverflow.com/questions/3552461/how-to-format-a-javascript-date
     const dateTimeFormat = new Intl.DateTimeFormat('en', {'year': '2-digit', 'month': 'short', 'day': '2-digit', 'hour': '2-digit', 'minute': '2-digit', 'hourCycle': 'h24', 'timeZone': 'UTC'});

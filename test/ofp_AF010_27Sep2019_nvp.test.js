@@ -113,6 +113,70 @@ test("ogimet route name", () => {
   expect(data.route.name).toEqual('Route Gramet AF010 LFPG-KJFK 27Sep19 15:14z OFP 6');
   expect(data.proxy).toEqual('0-1569597240-8-350-');
 });
+
+test("ogimet route tref stays on the OFP day", () => {
+  const RealDate = Date;
+  const fixedNow = new RealDate("2026-06-23T12:00:00Z");
+
+  class MockDate extends RealDate {
+    constructor(...args) {
+      if (args.length === 0) {
+        super(fixedNow);
+      } else {
+        super(...args);
+      }
+    }
+  }
+
+  global.Date = MockDate;
+
+  const originalOfpOUT = ofp.infos.ofpOUT;
+  const originalTaxiTimeOUT = ofp.infos.taxiTimeOUT;
+
+  try {
+    ofp.infos.ofpOUT = new RealDate("2026-06-23T00:30:00Z");
+    ofp.infos.taxiTimeOUT = 0;
+
+    const data = ogimetData(ofp, new GeoGridIndex());
+    expect(data.tref).toEqual(new RealDate("2026-06-23T00:30:00Z").getTime() / 1000);
+  } finally {
+    global.Date = RealDate;
+    ofp.infos.ofpOUT = originalOfpOUT;
+    ofp.infos.taxiTimeOUT = originalTaxiTimeOUT;
+  }
+});
+
+test("ogimet route tref uses now for a previous day", () => {
+  const RealDate = Date;
+  const fixedNow = new RealDate("2026-06-23T12:00:00Z");
+
+  class MockDate extends RealDate {
+    constructor(...args) {
+      if (args.length === 0) {
+        super(fixedNow);
+      } else {
+        super(...args);
+      }
+    }
+  }
+
+  global.Date = MockDate;
+
+  const originalOfpOUT = ofp.infos.ofpOUT;
+  const originalTaxiTimeOUT = ofp.infos.taxiTimeOUT;
+
+  try {
+    ofp.infos.ofpOUT = new RealDate("2026-06-22T23:30:00Z");
+    ofp.infos.taxiTimeOUT = 0;
+
+    const data = ogimetData(ofp, new GeoGridIndex());
+    expect(data.tref).toEqual(fixedNow.getTime() / 1000);
+  } finally {
+    global.Date = RealDate;
+    ofp.infos.ofpOUT = originalOfpOUT;
+    ofp.infos.taxiTimeOUT = originalTaxiTimeOUT;
+  }
+});
 test('wptNamesEET', () => {
   let points = ofp.route.points;
   const results = ofp.wptNamesEET(ofp.wptCoordinates());
